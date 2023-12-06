@@ -36,7 +36,9 @@ fn part_2(input: &Vec<String>) -> u64 {
     for (card_idx, winning_cards_count) in winning_number_counts.iter().enumerate() {
         for next_card_offset in 1..*winning_cards_count + 1 {
             match card_counts.get(card_idx + next_card_offset as usize) {
-                Some(_) => card_counts[card_idx + next_card_offset as usize] += card_counts[card_idx],
+                Some(_) => {
+                    card_counts[card_idx + next_card_offset as usize] += card_counts[card_idx]
+                }
                 None => { /*no op, out of bounds */ }
             }
         }

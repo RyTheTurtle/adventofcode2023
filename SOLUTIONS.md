@@ -71,3 +71,12 @@ Result: 30
 ```
 
 Might not be the most efficient algorithm but it works for the problem input. My suspicion is that the problem would be exponentially more difficult if someone tries to solve by actually adding new card instances to the list of cards as they "win" copies. 
+
+## Day 5
+### Part 1
+The problem input with ranges looks like it's going to be prohibitively expensive to try to create a large array that holds every possible number, so I'm taking the approach of simply storing the ranges of each map and implementing functions to find the corresponding value for a given input using some math. 
+
+For a given source number `s`, we can check if it fits in the range for one of the map entries by checking if `s >= src range start && s < src range start + range`. If it is in one of the ranges, we can find the corresponding value for `s` by calculating offset `s - src range start` and then finding `destination range start + offset` to get the value. This should end up being `O(number of maps * number of ranges in each map)`.  
+
+### Part 2
+The main difference, besides a bit of parsing, is that we now have a lot more seeds to inspect. I'm going to try just brute forcing the number of seeds since the lookups are pretty fast, but if that is too slow, I'm going to attempt to deduplicate the possible seeds by seeing which seed ranges overlap. If 1 million seeds all fit in to the same range at the start, we don't need to look up each one since they'll all end up at the same place. 
