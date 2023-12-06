@@ -87,3 +87,19 @@ r1.start >= r2.start && r1.start < r2.end
 
 ```
 I was going to continue researching algorithms for efficient range querying, but I was running the brute force approach in parallel and it happened to finish (correctly) before I could get a better solution coded so stopping for today. Took ~30 minutes to compute part 2 by brute force. 
+
+By brute force on my M2 Pro macbook, here's the output stats from the problem input 
+```
+took 1352s to evaluate range
+total seeds to test : 1917300386
+Evaluated answer in 431s
+Result: <censored>
+```
+Most of the time was accumulating a set of 1.9B "seeds" to run through the same logic as part 1. I got the correct answer, but we can optimize this to not take 30+ minutes to run. 
+
+Checking every seed meant evaluating the logic from part 1 for roughly 1.9B iterations. To optimize this with a fairly straightforward approach, we can our approach to operate on ranges rather than on individual numbers. The `intersection`  of a range of numbers is the numbers that overlap between both ranges. The `difference` is what numbers are unique to each range. Computing these results as ranges, for any given input range being looked up in a map of ranges, I should at most get 3 ranges as outputs: The intersection, the lower end of the difference range, the upper end of the difference range. This will still make the solution `O(n)` where `n` is the number of ranges, but it won't scale linearly with the magnitude or the size of each range. Then it is just a matter of doing some math on the ranges to find all the "ouput ranges" from one of the seed almanacs, and then repeating that process for each of the ranges until we get to a list of ranges of location numbers that we can min.
+
+
+## Day 6 
+### Part 1 and 2
+Since the only difference is the input size, combining these descriptions. There wasn't really any trick to this day other than to use a math operation to compute whether or not a particular number of ms pressing the button at the start of the race would out-perform the current record distance. 

@@ -1,9 +1,9 @@
-use crate::util;
+use crate::util::{differences, intersect, Range, read_lines};
 use std::{time::{Duration, Instant}, collections::HashSet};
 
 pub fn solve() {
     println!("Day 5\n====");
-    let input = util::read_lines("./input/5.txt");
+    let input = read_lines("./input/5.txt");
     println!("Input line size: {}", input.len());
     println!("Part 1\n---");
     let part1 = part_1(&input);
@@ -40,26 +40,31 @@ fn part_2(input: &Vec<String>) -> u64 {
     println!("Enumerating seeds that need to be tested...");
     let  seed_enumer_start = Instant::now(); 
     for r in ranged_almanac.seeds.iter() { 
-        println!("{:?}", r);
-        for i in r.0..r.1 { 
-            seeds_to_test.insert(i);
+        for map in &ranged_almanac.maps { 
+            for val_range in &map.ranges { 
+                let map_range = Range(val_range.src_start, val_range.src_start+val_range.range);
+                let intersection = intersect(&map_range, r);
+                let diff = differences(&map_range, r);
+                println!("For ranges {:?}, {:?} : ",r,map_range);
+                println!("--Intersection: {:?} , Differences: {:?}", intersection, diff);
+            }
         }
     }
-    println!("  Took {:?}s to evaluate range", seed_enumer_start.elapsed().as_secs());
-    println!("total seeds to test : {:?}",seeds_to_test.len());
-    let answer_eval = Instant::now();
-    for seed in seeds_to_test { 
-        let mut value = seed; 
-        for map in &almanac.maps { 
-            // println!("Finding {:?} in {:?}",value,map.title);
-            value = next(&map, value);
-            // println!("  Result: {:?}", value);
-        }
-        if value < lowest { 
-            lowest = value; 
-        } 
-    }
-    println!("Evaluated answer in {:?}s", answer_eval.elapsed().as_secs());
+    // println!("  Took {:?}s to evaluate range", seed_enumer_start.elapsed().as_secs());
+    // println!("total seeds to test : {:?}",seeds_to_test.len());
+    // let answer_eval = Instant::now();
+    // for seed in seeds_to_test { 
+    //     let mut value = seed; 
+    //     for map in &almanac.maps { 
+    //         // println!("Finding {:?} in {:?}",value,map.title);
+    //         value = next(&map, value);
+    //         // println!("  Result: {:?}", value);
+    //     }
+    //     if value < lowest { 
+    //         lowest = value; 
+    //     } 
+    // }
+    // println!("Evaluated answer in {:?}s", answer_eval.elapsed().as_secs());
     lowest
 }
 
@@ -112,14 +117,14 @@ fn parse_ranged_seeds(result: &mut RangedAlmanac, input_iter: &mut std::slice::I
         .split_ascii_whitespace()
         .map(|s| s.parse::<u64>().unwrap())
         .collect();
-    let mut seeds: Vec<util::Range> = Vec::new();
+    let mut seeds: Vec<Range> = Vec::new();
     let mut seed_iter = seed_ranges.iter();
     loop { 
         match seed_iter.next() { 
             Some(start) => { 
                 match seed_iter.next() { 
                     Some(range) => { 
-                        seeds.push(util::Range(*start, start.checked_add(*range).unwrap() ))
+                        seeds.push(Range(*start, start.checked_add(*range).unwrap() ))
                     },
                     None => panic!("invalid seed range")
                 }
@@ -207,7 +212,7 @@ struct Almanac {
 
 #[derive(Debug)]
 struct RangedAlmanac { 
-    seeds: Vec<util::Range>,
+    seeds: Vec<Range>,
     maps: Vec<Mapping>
 }
 
