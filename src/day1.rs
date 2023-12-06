@@ -4,7 +4,7 @@ use crate::util;
 // in part 1, all we need is digit or no-op.
 pub fn solve() {
     println!("Day 1\n====");
-    let input = util::read_lines("./input/1.1.txt");
+    let input = util::read_lines("./input/1.txt");
     println!("Input line size: {}", input.len());
     println!("Part 1\n---");
     let part1 = part_1(&input);

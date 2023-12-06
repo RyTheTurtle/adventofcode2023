@@ -2,7 +2,7 @@ use crate::util;
 
 pub fn solve() {
     println!("Day 2\n====");
-    let input = util::read_lines("./input/2.1.txt");
+    let input = util::read_lines("./input/2.txt");
     println!("Input line size: {}", input.len());
     println!("Part 1\n---");
     let part1 = part_1(&input);

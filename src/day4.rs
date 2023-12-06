@@ -3,7 +3,7 @@ use std::{collections::HashSet, str::Split};
 
 pub fn solve() {
     println!("Day 4\n====");
-    let input = util::read_lines("./input/4.1.txt");
+    let input = util::read_lines("./input/4.txt");
     println!("Input line size: {}", input.len());
     println!("Part 1\n---");
     let part1 = part_1(&input);

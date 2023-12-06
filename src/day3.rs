@@ -36,7 +36,7 @@ struct GridCoordinate(i32, i32);
 
 pub fn solve() {
     println!("Day 3\n====");
-    let input = util::read_lines("./input/3.1.txt");
+    let input = util::read_lines("./input/3.txt");
     println!("Input line size: {}", input.len());
     println!("Part 1\n---");
     let part1 = part_1(&input);
