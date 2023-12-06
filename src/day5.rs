@@ -1,5 +1,5 @@
 use crate::util;
-use std::time::{Duration, Instant};
+use std::{time::{Duration, Instant}, collections::HashSet};
 
 pub fn solve() {
     println!("Day 5\n====");
@@ -32,28 +32,37 @@ fn part_1(input: &Vec<String>) -> u64 {
 }
 
 fn part_2(input: &Vec<String>) -> u64 {
-    let almanac : RangedAlmanac = to_ranged_almanac(input);
-    println!("{:?}",almanac); 
-    // brute force....
+    let ranged_almanac : RangedAlmanac = to_ranged_almanac(input);
+    let almanac : Almanac = to_almanac(input);
+    // brute force....fuck it 
     let mut lowest: u64 = u64::MAX;
-    for r in almanac.seeds { 
-        println!("Evaluating seed range {:?}",r); 
-        let start = Instant::now();
-        for seed in r.start .. r.end { 
-            let mut value = seed; 
-            for map in &almanac.maps { 
-                // println!("Finding {:?} in {:?}",value,map.title);
-                value = next(&map, value);
-                // println!("  Result: {:?}", value);
-            }
-            if value < lowest { 
-                lowest = value; 
-            }
+    let mut seeds_to_test : HashSet<u64> = HashSet::new(); 
+    println!("Enumerating seeds that need to be tested...");
+    let  seed_enumer_start = Instant::now(); 
+    for r in ranged_almanac.seeds.iter() { 
+        println!("{:?}", r);
+        for i in r.0..r.1 { 
+            seeds_to_test.insert(i);
         }
-        println!("  Took {:?}s to evaluate range",start.elapsed().as_secs());
     }
+    println!("  Took {:?}s to evaluate range", seed_enumer_start.elapsed().as_secs());
+    println!("total seeds to test : {:?}",seeds_to_test.len());
+    let answer_eval = Instant::now();
+    for seed in seeds_to_test { 
+        let mut value = seed; 
+        for map in &almanac.maps { 
+            // println!("Finding {:?} in {:?}",value,map.title);
+            value = next(&map, value);
+            // println!("  Result: {:?}", value);
+        }
+        if value < lowest { 
+            lowest = value; 
+        } 
+    }
+    println!("Evaluated answer in {:?}s", answer_eval.elapsed().as_secs());
     lowest
 }
+
 
 fn to_almanac(input: &Vec<String>) -> Almanac {
     let mut result = Almanac {
@@ -92,11 +101,6 @@ fn parse_seeds(result: &mut Almanac, input_iter: &mut std::slice::Iter<'_, Strin
         .collect();
 }
 
-#[derive(Debug)]
-struct SeedRange { 
-    start: u64, 
-    end: u64
-}
 
 fn parse_ranged_seeds(result: &mut RangedAlmanac, input_iter: &mut std::slice::Iter<'_, String>) {
     let seed_ranges: Vec<u64> = input_iter
@@ -108,14 +112,14 @@ fn parse_ranged_seeds(result: &mut RangedAlmanac, input_iter: &mut std::slice::I
         .split_ascii_whitespace()
         .map(|s| s.parse::<u64>().unwrap())
         .collect();
-    let mut seeds: Vec<SeedRange> = Vec::new();
+    let mut seeds: Vec<util::Range> = Vec::new();
     let mut seed_iter = seed_ranges.iter();
     loop { 
         match seed_iter.next() { 
             Some(start) => { 
                 match seed_iter.next() { 
                     Some(range) => { 
-                        seeds.push(SeedRange { start: *start, end: start.checked_add(*range).unwrap() })
+                        seeds.push(util::Range(*start, start.checked_add(*range).unwrap() ))
                     },
                     None => panic!("invalid seed range")
                 }
@@ -142,7 +146,7 @@ fn parse_ranged_maps(result: &mut RangedAlmanac,  input_iter: &mut std::slice::I
                                 .split_ascii_whitespace()
                                 .map(|s| s.parse::<u64>().unwrap())
                                 .collect();
-                            map.ranges.push(Range {
+                            map.ranges.push(MapRange {
                                 dest_start: v.get(0).unwrap().clone(),
                                 src_start: v.get(1).unwrap().clone(),
                                 range: v.get(2).unwrap().clone(),
@@ -176,7 +180,7 @@ fn parse_maps(result: &mut Almanac,  input_iter: &mut std::slice::Iter<'_, Strin
                                 .split_ascii_whitespace()
                                 .map(|s| s.parse::<u64>().unwrap())
                                 .collect();
-                            map.ranges.push(Range {
+                            map.ranges.push(MapRange {
                                 dest_start: v.get(0).unwrap().clone(),
                                 src_start: v.get(1).unwrap().clone(),
                                 range: v.get(2).unwrap().clone(),
@@ -203,29 +207,29 @@ struct Almanac {
 
 #[derive(Debug)]
 struct RangedAlmanac { 
-    seeds: Vec<SeedRange>,
+    seeds: Vec<util::Range>,
     maps: Vec<Mapping>
 }
 
 #[derive(Debug)]
 struct Mapping {
     title: String,
-    ranges: Vec<Range>,
+    ranges: Vec<MapRange>,
 }
 
 
 #[derive(Debug)]
-struct Range {
+struct MapRange {
     dest_start: u64,
     src_start: u64,
     range: u64,
 }
 
-fn is_in_range(r: &Range, n: u64) -> bool { 
+fn is_in_range(r: &MapRange, n: u64) -> bool { 
     n >= r.src_start && n < r.src_start+r.range 
 }
 
-fn get_dest(r: &Range, n: u64) -> u64 { 
+fn get_dest(r: &MapRange, n: u64) -> u64 { 
     if !is_in_range(r, n) { 
         return n;
     }
@@ -234,7 +238,7 @@ fn get_dest(r: &Range, n: u64) -> u64 {
 }
 
 fn next(m: &Mapping, n: u64) -> u64 {
-    let range: Vec<&Range> = m.ranges.iter().filter(|r| is_in_range(r, n)).collect();
+    let range: Vec<&MapRange> = m.ranges.iter().filter(|r| is_in_range(r, n)).collect();
     match range.get(0) { 
         Some(r) => get_dest(r, n),
         None => n

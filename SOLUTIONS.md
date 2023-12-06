@@ -79,4 +79,11 @@ The problem input with ranges looks like it's going to be prohibitively expensiv
 For a given source number `s`, we can check if it fits in the range for one of the map entries by checking if `s >= src range start && s < src range start + range`. If it is in one of the ranges, we can find the corresponding value for `s` by calculating offset `s - src range start` and then finding `destination range start + offset` to get the value. This should end up being `O(number of maps * number of ranges in each map)`.  
 
 ### Part 2
-The main difference, besides a bit of parsing, is that we now have a lot more seeds to inspect. I'm going to try just brute forcing the number of seeds since the lookups are pretty fast, but if that is too slow, I'm going to attempt to deduplicate the possible seeds by seeing which seed ranges overlap. If 1 million seeds all fit in to the same range at the start, we don't need to look up each one since they'll all end up at the same place. 
+The main difference, besides a bit of parsing, is that we now have a lot more seeds to inspect. I was originally going to brute force this, but that proved to be impractical given the large ranges. The next obvious solution seems to be to check what seed ranges overlap with each other.
+
+First, I'll attempt to dedup the seed ranges in the almanac so there's no overlapping ranges. Then, I'll do some math on the ranges of seeds compared to the starting ranges of the first map. Range r1 overlaps with range r2 if 
+```
+r1.start >= r2.start && r1.start < r2.end 
+
+```
+I was going to continue researching algorithms for efficient range querying, but I was running the brute force approach in parallel and it happened to finish (correctly) before I could get a better solution coded so stopping for today. Took ~30 minutes to compute part 2 by brute force. 
