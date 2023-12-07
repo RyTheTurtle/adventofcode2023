@@ -1,4 +1,4 @@
-use crate::util::{new_range, read_lines, Range, get_outputs, intersect, diff_lower, diff_upper};
+use crate::util::{diff_lower, diff_upper, get_outputs, intersect, new_range, read_lines, Range};
 use std::{
     collections::HashSet,
     time::{Duration, Instant},
@@ -34,37 +34,38 @@ fn part_1(input: &Vec<String>) -> u64 {
     lowest
 }
 
-// WIP. Originally brute forced, trying to get range math working correctly. 
+// WIP. Originally brute forced, trying to get range math working correctly.
 /**
- * TODO implement stack based approach for getting all outputs of a map 
- * 
+ * TODO implement stack based approach for getting all outputs of a map
+ *
  *  range_stack = <starting ranges>
  *  results = hashset of ranges
- *  while range_stack is not empty 
- *      pop a range off the stack 
- *      iterate through map ranges until we find an intersection 
+ *  while range_stack is not empty
+ *      pop a range off the stack
+ *      iterate through map ranges until we find an intersection
  *      convert intersection range to map range's destination range
  *      put "remainders" , if any, back on the stack
  */
 fn part_2(input: &Vec<String>) -> u64 {
     let ranged_almanac: RangedAlmanac = to_ranged_almanac(input);
     let start = Instant::now();
-    let mut ranges:HashSet<Range> = HashSet::new(); 
-    // set the initial ranges as the seed ranges from the almanac 
-    for seed in ranged_almanac.seeds { 
+    let mut ranges: HashSet<Range> = HashSet::new();
+    // set the initial ranges as the seed ranges from the almanac
+    for seed in ranged_almanac.seeds {
         ranges.insert(seed);
     }
     let mut almanac_map_iter = ranged_almanac.maps.iter();
-    loop { 
-        match almanac_map_iter.next() { 
-            Some(m) => { 
+    loop {
+        match almanac_map_iter.next() {
+            Some(m) => {
                 println!("part_2: Map {:?}", m);
                 println!("- processing ranges {:?}", ranges);
-                let output_ranges = get_outputs(&m, &ranges);
-            },
-            None => {break;}
+                ranges = get_outputs(&m, &ranges);
+            }
+            None => {
+                break;
+            }
         }
-        // break
     }
     println!("Evaluated answer in {:?} ms", start.elapsed().as_millis());
     println!("Ranges: {:?}", ranges);
