@@ -1,5 +1,8 @@
-use crate::util::{differences, intersect, Range, read_lines};
-use std::{time::{Duration, Instant}, collections::HashSet};
+use crate::util::{new_range, read_lines, Range, get_outputs, intersect, diff_lower, diff_upper};
+use std::{
+    collections::HashSet,
+    time::{Duration, Instant},
+};
 
 pub fn solve() {
     println!("Day 5\n====");
@@ -17,57 +20,56 @@ fn part_1(input: &Vec<String>) -> u64 {
     let almanac = to_almanac(input);
     let mut lowest: u64 = u64::MAX;
     for seed in almanac.seeds {
-        let mut value = seed; 
-        for map in &almanac.maps { 
+        let mut value = seed;
+        for map in &almanac.maps {
             // println!("Finding {:?} in {:?}",value,map.title);
             value = next(&map, value);
             // println!("  Result: {:?}", value);
         }
-        if value < lowest { 
-            lowest = value; 
+        if value < lowest {
+            lowest = value;
         }
     }
-    
+
     lowest
 }
 
+// WIP. Originally brute forced, trying to get range math working correctly. 
+/**
+ * TODO implement stack based approach for getting all outputs of a map 
+ * 
+ *  range_stack = <starting ranges>
+ *  results = hashset of ranges
+ *  while range_stack is not empty 
+ *      pop a range off the stack 
+ *      iterate through map ranges until we find an intersection 
+ *      convert intersection range to map range's destination range
+ *      put "remainders" , if any, back on the stack
+ */
 fn part_2(input: &Vec<String>) -> u64 {
-    let ranged_almanac : RangedAlmanac = to_ranged_almanac(input);
-    let almanac : Almanac = to_almanac(input);
-    // brute force....fuck it 
-    let mut lowest: u64 = u64::MAX;
-    let mut seeds_to_test : HashSet<u64> = HashSet::new(); 
-    println!("Enumerating seeds that need to be tested...");
-    let  seed_enumer_start = Instant::now(); 
-    for r in ranged_almanac.seeds.iter() { 
-        for map in &ranged_almanac.maps { 
-            for val_range in &map.ranges { 
-                let map_range = Range(val_range.src_start, val_range.src_start+val_range.range);
-                let intersection = intersect(&map_range, r);
-                let diff = differences(&map_range, r);
-                println!("For ranges {:?}, {:?} : ",r,map_range);
-                println!("--Intersection: {:?} , Differences: {:?}", intersection, diff);
-            }
-        }
+    let ranged_almanac: RangedAlmanac = to_ranged_almanac(input);
+    let start = Instant::now();
+    let mut ranges:HashSet<Range> = HashSet::new(); 
+    // set the initial ranges as the seed ranges from the almanac 
+    for seed in ranged_almanac.seeds { 
+        ranges.insert(seed);
     }
-    // println!("  Took {:?}s to evaluate range", seed_enumer_start.elapsed().as_secs());
-    // println!("total seeds to test : {:?}",seeds_to_test.len());
-    // let answer_eval = Instant::now();
-    // for seed in seeds_to_test { 
-    //     let mut value = seed; 
-    //     for map in &almanac.maps { 
-    //         // println!("Finding {:?} in {:?}",value,map.title);
-    //         value = next(&map, value);
-    //         // println!("  Result: {:?}", value);
-    //     }
-    //     if value < lowest { 
-    //         lowest = value; 
-    //     } 
-    // }
-    // println!("Evaluated answer in {:?}s", answer_eval.elapsed().as_secs());
-    lowest
+    let mut almanac_map_iter = ranged_almanac.maps.iter();
+    loop { 
+        match almanac_map_iter.next() { 
+            Some(m) => { 
+                println!("part_2: Map {:?}", m);
+                println!("- processing ranges {:?}", ranges);
+                let output_ranges = get_outputs(&m, &ranges);
+            },
+            None => {break;}
+        }
+        // break
+    }
+    println!("Evaluated answer in {:?} ms", start.elapsed().as_millis());
+    println!("Ranges: {:?}", ranges);
+    return ranges.into_iter().min().unwrap().0;
 }
-
 
 fn to_almanac(input: &Vec<String>) -> Almanac {
     let mut result = Almanac {
@@ -80,7 +82,6 @@ fn to_almanac(input: &Vec<String>) -> Almanac {
     parse_maps(&mut result, &mut input_iter);
     result
 }
-
 
 fn to_ranged_almanac(input: &Vec<String>) -> RangedAlmanac {
     let mut result: RangedAlmanac = RangedAlmanac {
@@ -106,7 +107,6 @@ fn parse_seeds(result: &mut Almanac, input_iter: &mut std::slice::Iter<'_, Strin
         .collect();
 }
 
-
 fn parse_ranged_seeds(result: &mut RangedAlmanac, input_iter: &mut std::slice::Iter<'_, String>) {
     let seed_ranges: Vec<u64> = input_iter
         .next()
@@ -119,24 +119,20 @@ fn parse_ranged_seeds(result: &mut RangedAlmanac, input_iter: &mut std::slice::I
         .collect();
     let mut seeds: Vec<Range> = Vec::new();
     let mut seed_iter = seed_ranges.iter();
-    loop { 
-        match seed_iter.next() { 
-            Some(start) => { 
-                match seed_iter.next() { 
-                    Some(range) => { 
-                        seeds.push(Range(*start, start.checked_add(*range).unwrap() ))
-                    },
-                    None => panic!("invalid seed range")
-                }
+    loop {
+        match seed_iter.next() {
+            Some(start) => match seed_iter.next() {
+                Some(range) => seeds.push(Range(*start, start.checked_add(*range).unwrap())),
+                None => panic!("invalid seed range"),
             },
-            None => break
+            None => break,
         }
     }
     result.seeds = seeds;
 }
 
 // just for compatability and not wanting to edit previous functions
-fn parse_ranged_maps(result: &mut RangedAlmanac,  input_iter: &mut std::slice::Iter<'_, String>) {
+fn parse_ranged_maps(result: &mut RangedAlmanac, input_iter: &mut std::slice::Iter<'_, String>) {
     loop {
         match input_iter.next() {
             Some(l) if l.contains("map:") => {
@@ -170,7 +166,7 @@ fn parse_ranged_maps(result: &mut RangedAlmanac,  input_iter: &mut std::slice::I
     }
 }
 
-fn parse_maps(result: &mut Almanac,  input_iter: &mut std::slice::Iter<'_, String>) {
+fn parse_maps(result: &mut Almanac, input_iter: &mut std::slice::Iter<'_, String>) {
     loop {
         match input_iter.next() {
             Some(l) if l.contains("map:") => {
@@ -211,41 +207,44 @@ struct Almanac {
 }
 
 #[derive(Debug)]
-struct RangedAlmanac { 
+struct RangedAlmanac {
     seeds: Vec<Range>,
-    maps: Vec<Mapping>
+    maps: Vec<Mapping>,
 }
 
 #[derive(Debug)]
-struct Mapping {
+pub struct Mapping {
     title: String,
-    ranges: Vec<MapRange>,
+    pub ranges: Vec<MapRange>,
 }
-
 
 #[derive(Debug)]
-struct MapRange {
-    dest_start: u64,
-    src_start: u64,
-    range: u64,
+pub struct MapRange {
+    pub dest_start: u64,
+    pub src_start: u64,
+    pub range: u64,
 }
 
-fn is_in_range(r: &MapRange, n: u64) -> bool { 
-    n >= r.src_start && n < r.src_start+r.range 
+fn is_in_range(r: &MapRange, n: u64) -> bool {
+    n >= r.src_start && n < r.src_start + r.range
 }
 
-fn get_dest(r: &MapRange, n: u64) -> u64 { 
-    if !is_in_range(r, n) { 
+fn get_dest(r: &MapRange, n: u64) -> u64 {
+    if !is_in_range(r, n) {
         return n;
     }
-    let offset = n - r.src_start; 
-    r.dest_start + offset 
+    let offset = n - r.src_start;
+    r.dest_start + offset
 }
 
 fn next(m: &Mapping, n: u64) -> u64 {
-    let range: Vec<&MapRange> = m.ranges.iter().filter(|r| is_in_range(r, n)).collect();
-    match range.get(0) { 
+    let range: Vec<&MapRange> = m
+        .ranges
+        .iter()
+        .filter(|r| is_in_range(r, n))
+        .collect();
+    match range.get(0) {
         Some(r) => get_dest(r, n),
-        None => n
+        None => n,
     }
 }
