@@ -214,7 +214,7 @@ struct RangedAlmanac {
 
 #[derive(Debug)]
 pub struct Mapping {
-    title: String,
+    pub title: String,
     pub ranges: Vec<MapRange>,
 }
 

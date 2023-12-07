@@ -205,7 +205,7 @@ mod tests {
     #[test]
     pub fn test_get_destinations_exact_match(){ 
         // TODO implement tests
-        
-        // let input_map = Mapping{title: String::from("test"), vec![MapRange()]};
+            
+        let input_map = Mapping{title: String::from("test"), ranges: vec![]} ;
     }
 }
