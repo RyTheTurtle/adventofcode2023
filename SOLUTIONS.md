@@ -125,3 +125,28 @@ if we have a 3 of a kind, depends on how many jokers
 do this evaluation for all the hands and just hard code the logic. 
 
 The function signatures are a bit weird, but I parameterized the functions used for parsing the hand and ranking the hands so that I could swap out the strategy for how I rank the hands (using jokers logic or not) to minimize the duplication between parts 1 and 2.
+
+## Day 8
+### Part 1 
+For the first part, the algorithm is a basic map traversal. I first parsed the input in to a list of instructions and a map of `{current node: (left move, right move)}` just like the input is formatted. This lets us find the next steps to take in constant time, so solving the problem is just a matter of looking up the current position in the hashmap, setting the current position to either the left or right move depending on the current instruction, and repeat this until we land on `ZZZ` while keeping a counter of the number of iterations we take. 
+
+To handle the parsing, I chose to implement a regex this time for fun since I don't practice regex a lot and this problem seemed like an easy one for using regex to save a few lines of code. I would probably prefer just using `split` in production code for such a simple parsing operation though, since that is way more readable than even the simple regex I wrote. 
+
+To handle the situation of repeating over the instructions in order until we reached the target node, I implemented my logic to treat the list of steps like a queue. On each loop I dequeue the instruction and then add it back to the end of the queue and just keep doing that until we're done with the traversal. Less memory efficient than using iterators but didn't seem to have a big imapct on time for solving this part.
+
+### Part 2
+My first attempt was to brute force this by modifying my code from part 1 to increment the positions of a list of starting positions rather than a single starting position. This predictably doesn't scale and after running it for a few minutes on my laptop, I realized that there is probably some math involved. 
+
+For starters, I refactored my part 1 code to generalize the looping function that counts the steps from an arbitrary starting point until an arbitrary ending condition is met. The ending condition parameter is a function so that I could reuse the function for both part 1 and 2 without much copy/pasting of code, since part 1 the function just needs to check if the current position is `ZZZ` but part 2 we have to check if the position simply ends in `Z`. 
+
+I made the (luckily correct) assumption that each starting point would make a cycle by the time it lands on a valid ending point, such that if it takes 10 steps to get to an ending point, and we continue the instructions we were given, we won't hit another valid ending point until exactly 10 steps again. 
+
+If this is true ( which is is for the given problem input), the answer to how many steps it takes before every starting point simultaneously is on a valid ending point is the Least Common Multiple(LCM) of the number of steps it takes for each starting point to reach an ending point. So the algorithm is roughly 
+
+- parse the input to instructions and a map of points and valid directions to move
+- collect a list of all the points starting with the letter `A`
+- for each starting point `P`, run the calculation from part 1 to find the total steps it takes to reach a valid ending point 
+- find the least common multiple of all the step counts
+
+
+ A little research found that a fast way to find the LCM of two numbers a and b is `lcm(a,b) = a * b / hcf(a,b)`. Finding the highest common factor (HCF) of two numbers quickly is to just check the factors of the smaller number (in descending order) to see if the larger number is evenly divisibible by the same factor. This approach minimizes the amount of time to factorize a number, so even though we end up finding the HCF beween some numbers in the billions, we never need to factorize a number greater than 21,000. 
