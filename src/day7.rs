@@ -16,8 +16,14 @@ pub fn solve() {
     let part2 = part_2(&input);
     println!("Result: {}\n====", part2);
 }
+
+/**
+ * NOTE: To avoid too much copy/pasting, for part 2 I re-ranked 'J' to be lowest
+ * to conform to the problem requirements. For part 1, J should be after T and before Q.
+ */
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Clone, Copy, Hash)]
 enum Card {
+    J,
     n2,
     n3,
     n4,
@@ -27,10 +33,30 @@ enum Card {
     n8,
     n9,
     T,
-    J,
     Q,
     K,
     A,
+}
+
+fn get(c: char) -> Card {
+    return match c {
+        '2' => Card::n2,
+        '3' => Card::n3,
+        '4' => Card::n4,
+        '5' => Card::n5,
+        '6' => Card::n6,
+        '7' => Card::n7,
+        '8' => Card::n8,
+        '9' => Card::n9,
+        'T' => Card::T,
+        'J' => Card::J,
+        'Q' => Card::Q,
+        'K' => Card::K,
+        'A' => Card::A,
+        _ => {
+            panic!("Invalid char for hand {:?}", c)
+        }
+    };
 }
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Clone)]
 struct Hand {
@@ -106,9 +132,34 @@ fn rank(h: &Vec<Card>) -> HandType {
     }
 }
 
-fn parse_bid(input: &String) -> Bid {
+fn rank_jokers(h: &Vec<Card>) -> HandType {
+    let joker_count = h.iter().filter(|c| **c == Card::J).count();
+    return match rank(h) {
+        HandType::FiveOfKind | HandType::FourOfKind | HandType::FullHouse if joker_count > 0 => {
+            HandType::FiveOfKind
+        }
+
+        HandType::ThreeOfKind if joker_count == 1 => HandType::FourOfKind,
+        HandType::ThreeOfKind if joker_count == 3 => HandType::FourOfKind,
+
+        HandType::TwoPair if joker_count == 1 => HandType::FullHouse,
+        HandType::TwoPair if joker_count == 2 => HandType::FourOfKind,
+
+        HandType::OnePair if joker_count == 1 => HandType::ThreeOfKind,
+        HandType::OnePair if joker_count == 2 => HandType::ThreeOfKind,
+
+        HandType::HighCard if joker_count == 1 => HandType::OnePair,
+        _ => rank(h),
+    };
+}
+
+fn parse_bid(
+    input: &String,
+    hand_parser_strategy: fn(&str, fn(&Vec<Card>) -> HandType) -> Hand,
+    hand_rank_strategy: fn(&Vec<Card>) -> HandType,
+) -> Bid {
     let mut iter = input.split_ascii_whitespace();
-    let hand = parse_hand(iter.next().unwrap());
+    let hand = hand_parser_strategy(iter.next().unwrap(), hand_rank_strategy);
     let amount: u32 = iter.next().unwrap().parse().unwrap();
     Bid {
         hand: hand,
@@ -116,29 +167,9 @@ fn parse_bid(input: &String) -> Bid {
     }
 }
 
-fn parse_hand(h: &str) -> Hand {
-    let mut hand: Vec<Card> = Vec::new();
-    for c in h.trim().chars() {
-        match c {
-            '2' => hand.push(Card::n2),
-            '3' => hand.push(Card::n3),
-            '4' => hand.push(Card::n4),
-            '5' => hand.push(Card::n5),
-            '6' => hand.push(Card::n6),
-            '7' => hand.push(Card::n7),
-            '8' => hand.push(Card::n8),
-            '9' => hand.push(Card::n9),
-            'T' => hand.push(Card::T),
-            'J' => hand.push(Card::J),
-            'Q' => hand.push(Card::Q),
-            'K' => hand.push(Card::K),
-            'A' => hand.push(Card::A),
-            _ => {
-                panic!("Invalid char for hand {:?}", c)
-            }
-        }
-    }
-    let rank = rank(&hand);
+fn parse_hand(h: &str, hand_rank_strategy: fn(&Vec<Card>) -> HandType) -> Hand {
+    let hand: Vec<Card> = h.trim().chars().map(get).collect();
+    let rank = hand_rank_strategy(&hand);
     Hand {
         cards: hand,
         hand_type: rank,
@@ -146,21 +177,14 @@ fn parse_hand(h: &str) -> Hand {
 }
 
 fn compare(b1: &Bid, b2: &Bid) -> Ordering {
-    match b1
-        .hand
-        .hand_type
-        .cmp(&b2.hand.hand_type)
-    {
+    match b1.hand.hand_type.cmp(&b2.hand.hand_type) {
         Ordering::Greater => Ordering::Greater,
         Ordering::Less => Ordering::Less,
         Ordering::Equal => {
             for card_idx in 0..5 {
-                match b1
-                    .hand
-                    .cards
-                    .get(card_idx)
-                    .cmp(&b2.hand.cards.get(card_idx))
-                {
+                let b1_card = b1.hand.cards.get(card_idx);
+                let b2_card = b2.hand.cards.get(card_idx);
+                match b1_card.cmp(&b2_card) {
                     Ordering::Equal => {
                         continue;
                     }
@@ -178,7 +202,10 @@ fn compare(b1: &Bid, b2: &Bid) -> Ordering {
 }
 
 fn part_1(input: &Vec<String>) -> u64 {
-    let mut bids: Vec<Bid> = input.iter().map(parse_bid).collect();
+    let mut bids: Vec<Bid> = input
+        .iter()
+        .map(|s| parse_bid(s, parse_hand, rank))
+        .collect();
     bids.sort_by(compare);
     let mut result: u64 = 0;
     for (i, bid) in bids.into_iter().enumerate() {
@@ -188,5 +215,14 @@ fn part_1(input: &Vec<String>) -> u64 {
 }
 
 fn part_2(input: &Vec<String>) -> u64 {
-    0
+    let mut bids: Vec<Bid> = input
+        .iter()
+        .map(|s| parse_bid(s, parse_hand, rank_jokers))
+        .collect();
+    bids.sort_by(compare);
+    let mut result: u64 = 0;
+    for (i, bid) in bids.into_iter().enumerate() {
+        result += (((i as u64) + 1) * bid.amount as u64) as u64;
+    }
+    result
 }

@@ -103,3 +103,25 @@ Checking every seed meant evaluating the logic from part 1 for roughly 1.9B iter
 ## Day 6 
 ### Part 1 and 2
 Since the only difference is the input size, combining these descriptions. There wasn't really any trick to this day other than to use a math operation to compute whether or not a particular number of ms pressing the button at the start of the race would out-perform the current record distance. 
+
+## Day 7 
+### Part 1 
+Solving part 1 is pretty straightforward after finishing parsing the input. Anticipating we'll need to rank hands differently in part 2, I decided to take some time to build out separate structs and enums for cards, hands, and bids, including creating a bid comparison function to use. 
+
+### Part 2
+Brute forcing part 2 by evaluating all permutations of each hand will dramatically increase the scope of the inputs we have to evaluate, making it not feasible. Instead, we know that hands have 5 cards and depending on each type of hand, changing the jokers to a different card will have a more optimal effect and these can be hard coded to make the added logic effectively constant (the overall solution is still the cost of sorting bids). 
+
+For example, if we have a hand that has a 4 of a kind, we can always create a 5 of a kind. If we have a hand that is a 5 of a kind, that's already the maximum hand. 
+
+If we have a hand that is a full house, it depends on how many jokers we have:
+- 0 jokers, max rank possible is 3 of a kind 
+- 2 or 3 jokers, max rank possible is 5 of a kid 
+
+if we have a 3 of a kind, depends on how many jokers 
+- 0 jokers, max rank is 3 of a kind
+- 1 joker, max rank is 4 of a kind 
+- no other possibilities, because if we had a 3 of a kind and 2 jokers, it'd be a full house 
+
+do this evaluation for all the hands and just hard code the logic. 
+
+The function signatures are a bit weird, but I parameterized the functions used for parsing the hand and ranking the hands so that I could swap out the strategy for how I rank the hands (using jokers logic or not) to minimize the duplication between parts 1 and 2.
