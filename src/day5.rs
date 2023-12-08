@@ -4,19 +4,7 @@ use std::{
     time::{Duration, Instant},
 };
 
-pub fn solve() {
-    println!("Day 5\n====");
-    let input = read_lines("./input/5.txt");
-    println!("Input line size: {}", input.len());
-    println!("Part 1\n---");
-    let part1 = part_1(&input);
-    println!("Result: {}", part1);
-    println!("Part 2\n---");
-    let part2 = part_2(&input);
-    println!("Result: {}\n====", part2);
-}
-
-fn part_1(input: &Vec<String>) -> u64 {
+pub fn part_1(input: &Vec<String>) -> u64 {
     let almanac = to_almanac(input);
     let mut lowest: u64 = u64::MAX;
     for seed in almanac.seeds {
@@ -46,7 +34,7 @@ fn part_1(input: &Vec<String>) -> u64 {
  *      convert intersection range to map range's destination range
  *      put "remainders" , if any, back on the stack
  */
-fn part_2(input: &Vec<String>) -> u64 {
+pub fn part_2(input: &Vec<String>) -> u64 {
     let ranged_almanac: RangedAlmanac = to_ranged_almanac(input);
     let start = Instant::now();
     let mut ranges: HashSet<Range> = HashSet::new();

@@ -81,7 +81,7 @@ fn count_steps_to_end(map: &Map, start: &String, end_strategy: fn(&String) -> bo
     total_steps
 }
 
-fn part_1(input: &Vec<String>) -> u64 {
+pub fn part_1(input: &Vec<String>) -> u64 {
     let desertMap: Map = parse_map(input);
     return count_steps_to_end(&desertMap, &String::from("AAA"), ending_all_z_strategy);
 }
@@ -120,7 +120,7 @@ fn get_lcm_of_vec(n: &Vec<u64>) -> u64 {
     return stack.get(0).unwrap().clone();
 }
 
-fn part_2(input: &Vec<String>) -> u64 {
+pub fn part_2(input: &Vec<String>) -> u64 {
     // parse the map
     // collect a list of all nodes that end with A
     // on each step, iterate all of the nodes toward the next step

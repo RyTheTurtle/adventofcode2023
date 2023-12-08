@@ -1,24 +1,10 @@
 use crate::util;
-
-// parse calibration values using a strategy pattern for different types of characters
-// in part 1, all we need is digit or no-op.
-pub fn solve() {
-    println!("Day 1\n====");
-    let input = util::read_lines("./input/1.txt");
-    println!("Input line size: {}", input.len());
-    println!("Part 1\n---");
-    let part1 = part_1(&input);
-    println!("Result: {}", part1);
-    println!("Part 2\n---");
-    let part2 = part_2(&input);
-    println!("Result: {}\n====", part2);
-}
-
-fn part_1(v: &Vec<String>) -> u32 {
+ 
+pub fn part_1(v: &Vec<String>) -> u32 {
     v.iter().map(get_calibration_value).sum()
 }
 
-fn part_2(v: &Vec<String>) -> u32 {
+pub fn part_2(v: &Vec<String>) -> u32 {
     v.iter().map(get_calibration_value_v2).sum()
 }
 

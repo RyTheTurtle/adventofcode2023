@@ -1,3 +1,5 @@
+use std::time::Instant;
+
 mod day1;
 mod day2;
 mod day3;
@@ -9,12 +11,55 @@ mod day8;
 mod util;
 fn main() {
     println!("Advent of Code 2023");
-    // day1::solve();
-    // day2::solve();
-    // day3::solve();
-    // day4::solve();
-    // day5::solve();
-    // day6::solve();
-    // day7::solve();
-    day8::solve();
+    let day : u8 = std::env::args().nth(1).expect("Missing day argument").parse().expect("Day should be a number");
+    let part : u8 = std::env::args().nth(2).expect("Missing part argument").parse().expect("part should be a number");
+    print!("Day {:?} Part {:?} : ",day, part); 
+
+    let input = util::read_lines(format!("./input/{}.txt", day));
+    let start = Instant::now();    
+    let result : u64 = match day { 
+        1 => match part { 
+            1 => day1::part_1(&input) as u64,
+            2 => day1::part_2(&input) as u64,
+            _ => panic!("Invalid part")
+        },
+        2 => match part { 
+            1 => day2::part_1(&input) as u64,
+            2 => day2::part_2(&input) as u64,
+            _ => panic!("Invalid part")
+        },
+        3 => match part { 
+            1 => day3::part_1(&input)  as u64,
+            2 => day3::part_2(&input),
+            _ => panic!("Invalid part")
+        },
+        4 => match part { 
+            1 => day4::part_1(&input),
+            2 => day4::part_2(&input),
+            _ => panic!("Invalid part")
+        },
+        5 => match part { 
+            1 => day5::part_1(&input),
+            2 => day5::part_2(&input),
+            _ => panic!("Invalid part")
+        },
+        6 => match part { 
+            1 => day6::part_1(&input),
+            2 => day6::part_2(&input),
+            _ => panic!("Invalid part")
+        },
+        7 => match part { 
+            1 => day7::part_1(&input),
+            2 => day7::part_2(&input),
+            _ => panic!("Invalid part")
+        },
+        8 => match part { 
+            1 => day8::part_1(&input),
+            2 => day8::part_2(&input),
+            _ => panic!("Invalid part")
+        },
+        _ => panic!("Invalid day")
+    };
+    println!("{:?}", result);
+    println!("Took {:?} ms", start.elapsed().as_millis());
 }

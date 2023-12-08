@@ -5,18 +5,6 @@ use std::{
     time::{Duration, Instant},
 };
 
-pub fn solve() {
-    println!("Day 7\n====");
-    let input = util::read_lines("./input/7.txt");
-    println!("Input line size: {}", input.len());
-    println!("Part 1\n---");
-    let part1 = part_1(&input);
-    println!("Result: {}", part1);
-    println!("Part 2\n---");
-    let part2 = part_2(&input);
-    println!("Result: {}\n====", part2);
-}
-
 /**
  * NOTE: To avoid too much copy/pasting, for part 2 I re-ranked 'J' to be lowest
  * to conform to the problem requirements. For part 1, J should be after T and before Q.
@@ -201,7 +189,7 @@ fn compare(b1: &Bid, b2: &Bid) -> Ordering {
     }
 }
 
-fn part_1(input: &Vec<String>) -> u64 {
+pub fn part_1(input: &Vec<String>) -> u64 {
     let mut bids: Vec<Bid> = input
         .iter()
         .map(|s| parse_bid(s, parse_hand, rank))
@@ -214,7 +202,7 @@ fn part_1(input: &Vec<String>) -> u64 {
     result
 }
 
-fn part_2(input: &Vec<String>) -> u64 {
+pub fn part_2(input: &Vec<String>) -> u64 {
     let mut bids: Vec<Bid> = input
         .iter()
         .map(|s| parse_bid(s, parse_hand, rank_jokers))

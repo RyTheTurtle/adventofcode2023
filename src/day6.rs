@@ -4,19 +4,7 @@ use std::{
     time::{Duration, Instant},
 };
 
-pub fn solve() {
-    println!("Day 6\n====");
-    let input = util::read_lines("./input/6.txt");
-    println!("Input line size: {}", input.len());
-    println!("Part 1\n---");
-    let part1 = part_1(&input);
-    println!("Result: {}", part1);
-    println!("Part 2\n---");
-    let part2 = part_2(&input);
-    println!("Result: {}\n====", part2);
-}
-
-fn part_1(input: &Vec<String>) -> u64 {
+pub fn part_1(input: &Vec<String>) -> u64 {
     // parse inputs
     let times = util::parse_number_vec_following_colon(&input[0]);
     let distances = util::parse_number_vec_following_colon(&input[1]);
@@ -36,7 +24,7 @@ fn part_1(input: &Vec<String>) -> u64 {
         .fold(1, |acc, &e| acc * e);
 }
 
-fn part_2(input: &Vec<String>) -> u64 {
+pub fn part_2(input: &Vec<String>) -> u64 {
     // parse inputs
     let times = util::parse_number_vec_following_colon(&input[0]);
     let distances = util::parse_number_vec_following_colon(&input[1]);

@@ -1,18 +1,7 @@
 use crate::util;
 
-pub fn solve() {
-    println!("Day 2\n====");
-    let input = util::read_lines("./input/2.txt");
-    println!("Input line size: {}", input.len());
-    println!("Part 1\n---");
-    let part1 = part_1(&input);
-    println!("Result: {}", part1);
-    println!("Part 2\n---");
-    let part2 = part_2(&input);
-    println!("Result: {}\n====", part2);
-}
 
-fn part_1(input: &Vec<String>) -> u32 {
+pub fn part_1(input: &Vec<String>) -> u32 {
     input
         .into_iter()
         .map(build_game)
@@ -21,7 +10,7 @@ fn part_1(input: &Vec<String>) -> u32 {
         .sum::<u32>()
 }
 
-fn part_2(input: &Vec<String>) -> u32 {
+pub fn part_2(input: &Vec<String>) -> u32 {
     input
         .into_iter()
         .map(build_game)

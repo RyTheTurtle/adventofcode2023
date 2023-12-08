@@ -34,19 +34,7 @@ fn build_grid(input: &Vec<String>) -> Grid {
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Hash, Copy, Clone)]
 struct GridCoordinate(i32, i32);
 
-pub fn solve() {
-    println!("Day 3\n====");
-    let input = util::read_lines("./input/3.txt");
-    println!("Input line size: {}", input.len());
-    println!("Part 1\n---");
-    let part1 = part_1(&input);
-    println!("Result: {}", part1);
-    println!("Part 2\n---");
-    let part2 = part_2(&input);
-    println!("Result: {}\n====", part2);
-}
-
-fn part_1(input: &Vec<String>) -> u32 {
+pub fn part_1(input: &Vec<String>) -> u32 {
     // build a grid from the input and
     // scan grid for indices of symbols
     let grid = build_grid(input);
@@ -91,7 +79,7 @@ fn part_1(input: &Vec<String>) -> u32 {
     result
 }
 
-fn part_2(input: &Vec<String>) -> u64 {
+pub fn part_2(input: &Vec<String>) -> u64 {
     // build a grid from the input and
     // scan grid for indices of symbols
     let grid = build_grid(input);
