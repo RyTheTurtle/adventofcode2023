@@ -37,20 +37,9 @@ fn build_game(input: &String) -> Game {
         .unwrap()
         .split_ascii_whitespace()
         .collect();
-    let game_id: u32 = game_id_parts
-        .get(1)
-        .unwrap()
-        .parse()
-        .unwrap();
-    let raw_rounds: Vec<&str> = input_parts
-        .get(1)
-        .unwrap()
-        .split(";")
-        .collect();
-    let rounds: Vec<Round> = raw_rounds
-        .iter()
-        .map(build_round)
-        .collect();
+    let game_id: u32 = game_id_parts.get(1).unwrap().parse().unwrap();
+    let raw_rounds: Vec<&str> = input_parts.get(1).unwrap().split(";").collect();
+    let rounds: Vec<Round> = raw_rounds.iter().map(build_round).collect();
 
     let result = Game {
         id: game_id,
@@ -75,25 +64,13 @@ fn build_round(input: &&str) -> Round {
             .as_str()
         {
             "blue" => {
-                result.blue_count = dice_and_count
-                    .get(0)
-                    .unwrap()
-                    .parse()
-                    .unwrap();
+                result.blue_count = dice_and_count.get(0).unwrap().parse().unwrap();
             }
             "red" => {
-                result.red_count = dice_and_count
-                    .get(0)
-                    .unwrap()
-                    .parse()
-                    .unwrap();
+                result.red_count = dice_and_count.get(0).unwrap().parse().unwrap();
             }
             "green" => {
-                result.green_count = dice_and_count
-                    .get(0)
-                    .unwrap()
-                    .parse()
-                    .unwrap();
+                result.green_count = dice_and_count.get(0).unwrap().parse().unwrap();
             }
             _ => {}
         }

@@ -15,15 +15,11 @@ pub fn solve() {
 }
 
 fn part_1(v: &Vec<String>) -> u32 {
-    v.iter()
-        .map(get_calibration_value)
-        .sum()
+    v.iter().map(get_calibration_value).sum()
 }
 
 fn part_2(v: &Vec<String>) -> u32 {
-    v.iter()
-        .map(get_calibration_value_v2)
-        .sum()
+    v.iter().map(get_calibration_value_v2).sum()
 }
 
 fn get_calibration_value(s: &String) -> u32 {

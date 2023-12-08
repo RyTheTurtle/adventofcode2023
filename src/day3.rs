@@ -130,11 +130,7 @@ fn part_2(input: &Vec<String>) -> u64 {
 fn get_number_value(g: &Grid, c: &Vec<GridCoordinate>) -> u64 {
     let mut value: u64 = 0;
     for coord in c {
-        value = value * 10
-            + get(g, coord)
-                .unwrap()
-                .to_digit(10)
-                .unwrap() as u64;
+        value = value * 10 + get(g, coord).unwrap().to_digit(10).unwrap() as u64;
     }
     value
 }
