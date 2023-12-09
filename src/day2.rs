@@ -1,12 +1,12 @@
 use crate::util;
-
+use crate::structs::game::{Game, Round, GameCubeCount};
 
 pub fn part_1(input: &Vec<String>) -> u32 {
     input
         .into_iter()
         .map(build_game)
         .filter(is_valid_game)
-        .map(get_id)
+        .map(|g: Game| g.id)
         .sum::<u32>()
 }
 
@@ -66,25 +66,6 @@ fn build_round(input: &&str) -> Round {
     }
     return result;
 }
-
-fn get_id(g: Game) -> u32 {
-    g.id
-}
-
-#[derive(Debug)]
-struct Game {
-    id: u32,
-    rounds: Vec<Round>,
-}
-
-#[derive(Debug)]
-struct Round {
-    red_count: u32,
-    green_count: u32,
-    blue_count: u32,
-}
-
-struct GameCubeCount(u32, u32, u32);
 
 fn is_valid_game(g: &Game) -> bool {
     // simple hardcoding limits for part 1

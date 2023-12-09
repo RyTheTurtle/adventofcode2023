@@ -1,5 +1,5 @@
-use crate::util;
 use std::collections::HashSet;
+use crate::structs::grid::{Grid, GridCoordinate, from};
 
 // consts
 const ADJ_CELL_DELTAS: [GridCoordinate; 8] = [
@@ -15,30 +15,11 @@ const ADJ_CELL_DELTAS: [GridCoordinate; 8] = [
 const BLANK: char = '.';
 const GEAR: char = '*';
 
-// structs
-#[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]
-struct Grid {
-    rows: Vec<Vec<char>>,
-}
-
-fn build_grid(input: &Vec<String>) -> Grid {
-    let mut grid_rows: Vec<Vec<char>> = Vec::new();
-    for row in input {
-        let r: Vec<char> = row.chars().collect();
-        grid_rows.push(r);
-    }
-
-    Grid { rows: grid_rows }
-}
-
-#[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Hash, Copy, Clone)]
-struct GridCoordinate(i32, i32);
-
 pub fn part_1(input: &Vec<String>) -> u32 {
     // build a grid from the input and
     // scan grid for indices of symbols
-    let grid = build_grid(input);
-    let symbol_coordinates = find_symbols(&grid);
+    let grid = from(input);
+    let symbol_coordinates = find(&grid, |c| c != &BLANK && c.to_digit(10) == None);
 
     let mut partial_part_number: HashSet<GridCoordinate> = HashSet::new();
     for symbol in symbol_coordinates {
@@ -82,16 +63,8 @@ pub fn part_1(input: &Vec<String>) -> u32 {
 pub fn part_2(input: &Vec<String>) -> u64 {
     // build a grid from the input and
     // scan grid for indices of symbols
-    let grid = build_grid(input);
-    let mut gear_coordinates: Vec<GridCoordinate> = Vec::new();
-
-    for (r, row) in grid.rows.iter().enumerate() {
-        for (c, col) in row.iter().enumerate() {
-            if col == &GEAR {
-                gear_coordinates.push(GridCoordinate(r as i32, c as i32));
-            }
-        }
-    }
+    let grid = from(input);
+    let gear_coordinates: Vec<GridCoordinate> = find(&grid, |c| c == &GEAR);
 
     let mut result: u64 = 0;
     for gear in gear_coordinates {
@@ -177,12 +150,16 @@ fn get_full_number_coordinates(partial: GridCoordinate, grid: &Grid) -> Vec<Grid
     number_points
 }
 
-fn find_symbols(grid: &Grid) -> Vec<GridCoordinate> {
+/**
+ * Given a filter, return the grid coordinates that the filter function
+ * returns true
+ */
+fn find(grid: &Grid, test: fn(&char) -> bool ) -> Vec<GridCoordinate> {
     let mut symbol_coordinates: Vec<GridCoordinate> = Vec::new();
 
     for (r, row) in grid.rows.iter().enumerate() {
         for (c, col) in row.iter().enumerate() {
-            if col != &BLANK && col.to_digit(10) == None {
+            if test(col) {
                 symbol_coordinates.push(GridCoordinate(r as i32, c as i32));
             }
         }

@@ -9,6 +9,7 @@ mod day6;
 mod day7;
 mod day8;
 mod util;
+mod structs;
 fn main() {
     println!("Advent of Code 2023");
     let day : u8 = std::env::args().nth(1).expect("Missing day argument").parse().expect("Day should be a number");
