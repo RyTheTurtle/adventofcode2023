@@ -1,9 +1,6 @@
 use crate::util;
 use regex::Regex;
-use std::{
-    collections::HashMap,
-    time::{Instant},
-};
+use std::{collections::HashMap, time::Instant};
 
 pub fn solve() {
     println!("Day 8\n====");
@@ -70,8 +67,8 @@ fn count_steps_to_end(map: &Map, start: &String, end_strategy: fn(&String) -> bo
         // as a queue
         let next_direction = instructions.remove(0);
         current_pos = match next_direction {
-            'L' =>  &directions.0,
-            'R' =>  &directions.1,
+            'L' => &directions.0,
+            'R' => &directions.1,
             _ => panic!("invalid direction"),
         };
         // put on end of queue
@@ -134,7 +131,7 @@ pub fn part_2(input: &Vec<String>) -> u64 {
         .filter(|k| k.ends_with("A"))
         .map(|p| count_steps_to_end(&m, p, ending_in_z_strategy))
         .collect();
-    
+
     let total_steps = get_lcm_of_vec(&step_counts);
     println!(
         "Finished finding LCM of steps after {:?} ms",

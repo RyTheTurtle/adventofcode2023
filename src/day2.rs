@@ -1,5 +1,5 @@
+use crate::structs::game::{Game, GameCubeCount, Round};
 use crate::util;
-use crate::structs::game::{Game, Round, GameCubeCount};
 
 pub fn part_1(input: &Vec<String>) -> u32 {
     input

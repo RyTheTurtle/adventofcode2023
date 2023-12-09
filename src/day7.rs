@@ -1,8 +1,5 @@
-use crate::structs::camel_card::{Bid,CamelCard,HandType, parse_bid, parse_hand, compare_bid};
-use std::{
-    cmp::Ordering,
-    collections::HashSet
-};
+use crate::structs::camel_card::{compare_bid, parse_bid, parse_hand, Bid, CamelCard, HandType};
+use std::{cmp::Ordering, collections::HashSet};
 
 fn rank(h: &Vec<CamelCard>) -> HandType {
     let unique_cards: HashSet<&CamelCard> = HashSet::from_iter(h.iter());
@@ -76,7 +73,6 @@ fn rank_jokers(h: &Vec<CamelCard>) -> HandType {
         _ => rank(h),
     };
 }
-
 
 pub fn part_1(input: &Vec<String>) -> u64 {
     let mut bids: Vec<Bid> = input

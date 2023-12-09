@@ -1,5 +1,5 @@
 /*
-Grid structures for day 3  
+Grid structures for day 3
 */
 
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Hash)]

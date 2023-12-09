@@ -1,5 +1,5 @@
+use crate::structs::grid::{from, Grid, GridCoordinate};
 use std::collections::HashSet;
-use crate::structs::grid::{Grid, GridCoordinate, from};
 
 // consts
 const ADJ_CELL_DELTAS: [GridCoordinate; 8] = [
@@ -154,7 +154,7 @@ fn get_full_number_coordinates(partial: GridCoordinate, grid: &Grid) -> Vec<Grid
  * Given a filter, return the grid coordinates that the filter function
  * returns true
  */
-fn find(grid: &Grid, test: fn(&char) -> bool ) -> Vec<GridCoordinate> {
+fn find(grid: &Grid, test: fn(&char) -> bool) -> Vec<GridCoordinate> {
     let mut symbol_coordinates: Vec<GridCoordinate> = Vec::new();
 
     for (r, row) in grid.rows.iter().enumerate() {

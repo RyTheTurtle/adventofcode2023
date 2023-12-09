@@ -1,5 +1,5 @@
 /**
- * Structs for representing the games in day 2 
+ * Structs for representing the games in day 2
  */
 #[derive(Debug)]
 pub struct Game {

@@ -24,7 +24,6 @@ pub enum CamelCard {
     A,
 }
 
-
 #[derive(Debug, PartialEq, Eq, PartialOrd, Ord, Clone)]
 pub struct Hand {
     pub cards: Vec<CamelCard>,
@@ -72,7 +71,6 @@ pub enum HandType {
     FiveOfKind,
 }
 
-
 pub fn get(c: char) -> CamelCard {
     return match c {
         '2' => CamelCard::n2,
@@ -93,7 +91,6 @@ pub fn get(c: char) -> CamelCard {
         }
     };
 }
-
 
 pub fn parse_bid(
     input: &String,
