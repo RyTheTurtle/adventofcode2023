@@ -38,12 +38,12 @@ pub fn part_2(input: &Vec<String>) -> u64 {
     for seed in ranged_almanac.seeds {
         ranges.insert(seed);
     }
-    println!("Starting ranges: {:?}",ranges);
+    println!("Starting ranges: {:?}", ranges);
 
     let mut almanac_map_iter = ranged_almanac.maps.iter();
     loop {
         match almanac_map_iter.next() {
-            Some(m) => { 
+            Some(m) => {
                 ranges = m.map_dest(&ranges);
             }
             None => {

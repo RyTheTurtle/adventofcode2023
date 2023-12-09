@@ -150,3 +150,10 @@ If this is true ( which is is for the given problem input), the answer to how ma
 
 
  A little research found that a fast way to find the LCM of two numbers a and b is `lcm(a,b) = a * b / hcf(a,b)`. Finding the highest common factor (HCF) of two numbers quickly is to just check the factors of the smaller number (in descending order) to see if the larger number is evenly divisibible by the same factor. This approach minimizes the amount of time to factorize a number, so even though we end up finding the HCF beween some numbers in the billions, we never need to factorize a number greater than 21,000. 
+
+ ## Day 9 
+ ### Part 1 
+ Nothing particularly tricky about this. Just implemented the algorithm exactly as described, keeping a list of `Vec`s representing the differences at each stage of calculating the extrapolated values and then working backwards once I find an iteration that is all `0`s. 
+
+ ### Part 2 
+ Same here, the only difference for extrapolating backwards is looking at the first element in the `Vec` of diffs at each stage instead of the last one, and making sure to subtract the values between each step in the calculation for the extrapolation rather than adding. 

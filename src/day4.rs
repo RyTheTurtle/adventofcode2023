@@ -1,4 +1,4 @@
-use crate::util;
+use crate::{structs::scratchcard::ScratchCard, util};
 use std::{collections::HashSet, str::Split};
 
 pub fn part_1(input: &Vec<String>) -> u64 {
@@ -34,26 +34,20 @@ pub fn part_2(input: &Vec<String>) -> u64 {
     card_counts.iter().sum::<u64>()
 }
 
-#[derive(Debug)]
-struct Card {
-    numbers_you_have: Vec<u8>,
-    winning_numbers: Vec<u8>,
-}
-
-fn count_winning_numbers(c: Card) -> u8 {
+fn count_winning_numbers(c: ScratchCard) -> u8 {
     let n: HashSet<&u8> = HashSet::from_iter(c.numbers_you_have.iter());
     let w: HashSet<&u8> = HashSet::from_iter(c.winning_numbers.iter());
     n.intersection(&w).count() as u8
 }
 
-fn get_score(c: Card) -> u64 {
+fn get_score(c: ScratchCard) -> u64 {
     match count_winning_numbers(c) {
         0 => 0,
         d => 2_u64.pow(d as u32 - 1),
     }
 }
 
-fn to_card(s: &String) -> Card {
+fn to_card(s: &String) -> ScratchCard {
     let parts: Vec<Vec<u8>> = s
         .split(":")
         .into_iter()
@@ -63,7 +57,7 @@ fn to_card(s: &String) -> Card {
         .map(to_u8_vec)
         .collect();
 
-    Card {
+    ScratchCard {
         numbers_you_have: parts.get(0).unwrap().to_vec(),
         winning_numbers: parts.get(1).unwrap().to_vec(),
     }

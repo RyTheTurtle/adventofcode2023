@@ -68,13 +68,22 @@ fn main() {
             2 => day8::part_2(&input),
             _ => panic!("Invalid part"),
         },
-        9 => match part {
-            1 => day8::part_1(&input),
-            2 => day8::part_2(&input),
-            _ => panic!("Invalid part"),
-        },
-        _ => panic!("Invalid day"),
+        _ => 0,
     };
+    // separate block for days requiring i64 output
+    if result == 0 {
+        let result = match day {
+            9 => match part {
+                1 => day9::part_1(&input),
+                2 => day9::part_2(&input),
+                _ => panic!("Invalid part"),
+            },
+            _ => 0,
+        };
+        println!("{:?}", result);
+        println!("Took {:?} ms", start.elapsed().as_millis());
+        return;
+    }
     println!("{:?}", result);
     println!("Took {:?} ms", start.elapsed().as_millis());
 }

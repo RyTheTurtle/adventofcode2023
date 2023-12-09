@@ -12,79 +12,77 @@ impl AlmanacRange {
         AlmanacRange(a.min(b), a.max(b))
     }
 
-
-pub fn diff_lower(a: &AlmanacRange, b: &AlmanacRange) -> Option<AlmanacRange> {
-    match AlmanacRange::intersect(a, b) {
-        None => {
-            // no intersection, take the lower of the two input ranges
-            return Some(a.min(b).clone());
-        }
-        _ => {
-            let b_starts_in_a = b.0 >= a.0 && b.0 < a.1;
-            let a_starts_in_b = a.0 >= b.0 && a.0 < b.1;
-
-            if b_starts_in_a {
-                return Some(AlmanacRange::new(a.0, b.0));
-            } else if a_starts_in_b {
-                return Some(AlmanacRange::new(b.0, a.0));
-            } else {
+    pub fn diff_lower(a: &AlmanacRange, b: &AlmanacRange) -> Option<AlmanacRange> {
+        match AlmanacRange::intersect(a, b) {
+            None => {
+                // no intersection, take the lower of the two input ranges
                 return Some(a.min(b).clone());
             }
-        }
-    }
-}
+            _ => {
+                let b_starts_in_a = b.0 >= a.0 && b.0 < a.1;
+                let a_starts_in_b = a.0 >= b.0 && a.0 < b.1;
 
-
-// returns the intersect, if any, of the range
-pub fn intersect(a: &AlmanacRange, b: &AlmanacRange) -> Option<AlmanacRange> {
-    if a == b {
-        return Some(a.clone());
-    }
-
-    let b_starts_in_a = b.0 >= a.0 && b.0 < a.1;
-    let b_ends_in_a = b.1 <= a.1 && b.1 > a.0;
-    let a_starts_in_b = a.0 >= b.0 && a.0 < b.1;
-    let a_ends_in_b = a.1 <= b.1 && a.1 > b.0;
-
-    if b_starts_in_a && b_ends_in_a {
-        return Some(b.clone());
-    } else if a_starts_in_b && a_ends_in_b {
-        return Some(a.clone());
-    } else if b_starts_in_a && !b_ends_in_a {
-        return Some(AlmanacRange::new(b.0, a.1));
-    } else if a_starts_in_b && !a_ends_in_b {
-        return Some(AlmanacRange::new(a.0, b.1));
-    }
-
-    None
-}
-
-pub fn diff_upper(a: &AlmanacRange, b: &AlmanacRange) -> Option<AlmanacRange> {
-    match AlmanacRange::intersect(a, b) {
-        Some(r) if r == *a || r == *b => {
-            // full intersection, no lower or upper bound diff
-            return None;
-        }
-        None => {
-            // no intersection, take the lower of the two input ranges
-            return Some(a.max(b).clone());
-        }
-        _ => {
-            let b_ends_in_a = b.1 <= a.1 && b.1 > a.0;
-            let a_ends_in_b = a.1 <= b.1 && a.1 > b.0;
-
-            if a.1 == b.1 {
-                return None;
-            } else if b_ends_in_a {
-                return Some(AlmanacRange::new(b.1 + 1, a.1));
-            } else if a_ends_in_b {
-                return Some(AlmanacRange::new(a.1 + 1, b.1));
-            } else {
-                return Some(a.max(b).clone());
+                if b_starts_in_a {
+                    return Some(AlmanacRange::new(a.0, b.0));
+                } else if a_starts_in_b {
+                    return Some(AlmanacRange::new(b.0, a.0));
+                } else {
+                    return Some(a.min(b).clone());
+                }
             }
         }
     }
-}
+
+    // returns the intersect, if any, of the range
+    pub fn intersect(a: &AlmanacRange, b: &AlmanacRange) -> Option<AlmanacRange> {
+        if a == b {
+            return Some(a.clone());
+        }
+
+        let b_starts_in_a = b.0 >= a.0 && b.0 < a.1;
+        let b_ends_in_a = b.1 <= a.1 && b.1 > a.0;
+        let a_starts_in_b = a.0 >= b.0 && a.0 < b.1;
+        let a_ends_in_b = a.1 <= b.1 && a.1 > b.0;
+
+        if b_starts_in_a && b_ends_in_a {
+            return Some(b.clone());
+        } else if a_starts_in_b && a_ends_in_b {
+            return Some(a.clone());
+        } else if b_starts_in_a && !b_ends_in_a {
+            return Some(AlmanacRange::new(b.0, a.1));
+        } else if a_starts_in_b && !a_ends_in_b {
+            return Some(AlmanacRange::new(a.0, b.1));
+        }
+
+        None
+    }
+
+    pub fn diff_upper(a: &AlmanacRange, b: &AlmanacRange) -> Option<AlmanacRange> {
+        match AlmanacRange::intersect(a, b) {
+            Some(r) if r == *a || r == *b => {
+                // full intersection, no lower or upper bound diff
+                return None;
+            }
+            None => {
+                // no intersection, take the lower of the two input ranges
+                return Some(a.max(b).clone());
+            }
+            _ => {
+                let b_ends_in_a = b.1 <= a.1 && b.1 > a.0;
+                let a_ends_in_b = a.1 <= b.1 && a.1 > b.0;
+
+                if a.1 == b.1 {
+                    return None;
+                } else if b_ends_in_a {
+                    return Some(AlmanacRange::new(b.1 + 1, a.1));
+                } else if a_ends_in_b {
+                    return Some(AlmanacRange::new(a.1 + 1, b.1));
+                } else {
+                    return Some(a.max(b).clone());
+                }
+            }
+        }
+    }
 }
 
 #[derive(Debug)]
@@ -243,93 +241,95 @@ pub struct Mapping {
     pub ranges: Vec<MapRange>,
 }
 
-impl Mapping { 
+impl Mapping {
     /**
- * Maps the input sources to the output destinations represented as a set of 
- * ranges. 
- * 
- *  any diffs are added back to stack for further processing only if we don't have a full match for the input range
-                    
-*  given two ranges
-*   aaaaaa
-*       bbbbbbb
-*  only take upper range
-* -----
-*       aaaaaaaa
-*    bbbbbbb
-*  only take lower diff
-* 
- * Values that are not mapped to something new from this mapping are output
- * as a range of value that are the same as the input.
- */
-pub fn map_dest(&self, sources: &HashSet<AlmanacRange>) -> HashSet<AlmanacRange> {
-    // populate stack
-    let mut range_stack: Vec<AlmanacRange> = Vec::new();
-    let mut already_processed: HashSet<AlmanacRange> = HashSet::new();
-    let mut results: HashSet<AlmanacRange> = HashSet::new();
-    for range in sources.clone() {
-        range_stack.push(range);
-    }
-    // process items off the stack
-    while range_stack.len() > 0 {
-        let current_range = range_stack.pop().unwrap();
-        // just in case we end up with some duplicate ranges showing up
-        match already_processed.get(&current_range) {
-            Some(r) => continue,
-            None => {
-                already_processed.insert(current_range);
-            }
-        }
-        // println!("current range:  {:?}", current_range);
-        // println!("range_stack:  {:?}", range_stack);
-        let mut found_intersection = false;
-        for mr in &self.ranges {
-            let map_range = AlmanacRange::new(mr.src_start, mr.src_start + mr.range);
-            // println!("Checking map range {:?}", map_range);
-            let intersection = AlmanacRange::intersect(&map_range, &current_range);
-            let lower_diff = AlmanacRange::diff_lower(&map_range, &current_range);
-            let upper_diff = AlmanacRange::diff_upper(&map_range, &current_range);
-            match intersection {
-                Some(r) => {
-                    // intersection is mapped to destination result
-                    // println!("Found intersection {:?}",r);
-                    found_intersection = true;
-                    let dist = r.1 - r.0 - 1;
-                    let offset = r.0 - mr.src_start;
-                    let output_range =
-                        AlmanacRange::new(mr.dest_start + offset, mr.dest_start + offset + dist);
-                    results.insert(output_range);
-                    
-                    if current_range != r {
-                        match lower_diff {
-                            Some(d) if current_range.0 < map_range.0 => {
-                                range_stack.push(d);
-                            }
-                            _ => {}
-                        }
-                        match upper_diff {
-                            Some(d) if current_range.0 > map_range.0 => {
-                                range_stack.push(d);
-                            }
-                            _ => {}
-                        }
-                    }
+     * Maps the input sources to the output destinations represented as a set of
+     * ranges.
+     *
+     *  any diffs are added back to stack for further processing only if we don't have a full match for the input range
 
-                    break;
-                }
+    *  given two ranges
+    *   aaaaaa
+    *       bbbbbbb
+    *  only take upper range
+    * -----
+    *       aaaaaaaa
+    *    bbbbbbb
+    *  only take lower diff
+    *
+     * Values that are not mapped to something new from this mapping are output
+     * as a range of value that are the same as the input.
+     */
+    pub fn map_dest(&self, sources: &HashSet<AlmanacRange>) -> HashSet<AlmanacRange> {
+        // populate stack
+        let mut range_stack: Vec<AlmanacRange> = Vec::new();
+        let mut already_processed: HashSet<AlmanacRange> = HashSet::new();
+        let mut results: HashSet<AlmanacRange> = HashSet::new();
+        for range in sources.clone() {
+            range_stack.push(range);
+        }
+        // process items off the stack
+        while range_stack.len() > 0 {
+            let current_range = range_stack.pop().unwrap();
+            // just in case we end up with some duplicate ranges showing up
+            match already_processed.get(&current_range) {
+                Some(r) => continue,
                 None => {
-                    // no intersection means this range maps to itself for output
-                    continue;
+                    already_processed.insert(current_range);
                 }
             }
+            // println!("current range:  {:?}", current_range);
+            // println!("range_stack:  {:?}", range_stack);
+            let mut found_intersection = false;
+            for mr in &self.ranges {
+                let map_range = AlmanacRange::new(mr.src_start, mr.src_start + mr.range);
+                // println!("Checking map range {:?}", map_range);
+                let intersection = AlmanacRange::intersect(&map_range, &current_range);
+                let lower_diff = AlmanacRange::diff_lower(&map_range, &current_range);
+                let upper_diff = AlmanacRange::diff_upper(&map_range, &current_range);
+                match intersection {
+                    Some(r) => {
+                        // intersection is mapped to destination result
+                        // println!("Found intersection {:?}",r);
+                        found_intersection = true;
+                        let dist = r.1 - r.0 - 1;
+                        let offset = r.0 - mr.src_start;
+                        let output_range = AlmanacRange::new(
+                            mr.dest_start + offset,
+                            mr.dest_start + offset + dist,
+                        );
+                        results.insert(output_range);
+
+                        if current_range != r {
+                            match lower_diff {
+                                Some(d) if current_range.0 < map_range.0 => {
+                                    range_stack.push(d);
+                                }
+                                _ => {}
+                            }
+                            match upper_diff {
+                                Some(d) if current_range.0 > map_range.0 => {
+                                    range_stack.push(d);
+                                }
+                                _ => {}
+                            }
+                        }
+
+                        break;
+                    }
+                    None => {
+                        // no intersection means this range maps to itself for output
+                        continue;
+                    }
+                }
+            }
+            if !found_intersection {
+                // range didn't map to any inputs
+                results.insert(current_range);
+            }
         }
-        if !found_intersection {
-            // range didn't map to any inputs
-            results.insert(current_range);
-        }
+        results
     }
-    results
-}
 }
 
 #[derive(Debug)]
@@ -340,7 +340,6 @@ pub struct MapRange {
 }
 
 // just for compatability and not wanting to edit previous functions
-
 
 #[cfg(test)]
 mod tests {
