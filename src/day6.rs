@@ -1,8 +1,5 @@
 use crate::util;
-use std::{
-    collections::HashSet,
-    time::{Duration, Instant},
-};
+
 
 pub fn part_1(input: &Vec<String>) -> u64 {
     // parse inputs

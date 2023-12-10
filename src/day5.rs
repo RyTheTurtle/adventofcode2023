@@ -1,5 +1,5 @@
 use crate::structs::almanac::{Almanac, u64Range, MapRange, Mapping, RangedAlmanac};
-use std::{collections::HashSet, time::Instant};
+use std::{collections::HashSet};
 
 pub fn part_1(input: &Vec<String>) -> u64 {
     let almanac = Almanac::from(input);

@@ -106,7 +106,7 @@ fn get_partial_part_numbers(gear: GridCoordinate, grid: &Grid) -> HashSet<GridCo
             Some(c) if c.is_digit(10) => {
                 partial_part_number.insert(check);
             }
-            Some(c) => { /* no-op, not a number */ }
+            Some(_c) => { /* no-op, not a number */ }
             None => { /* no-op, not a valid coordinate */ }
         }
     }
@@ -124,7 +124,7 @@ fn get_full_number_coordinates(partial: GridCoordinate, grid: &Grid) -> Vec<Grid
                 number_points.push(next);
                 dist += 1;
             }
-            Some(c) => break,
+            Some(_c) => break,
             None => break,
         }
     }

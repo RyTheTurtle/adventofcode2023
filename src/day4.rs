@@ -1,5 +1,5 @@
-use crate::{structs::scratchcard::ScratchCard, util};
-use std::{collections::HashSet, str::Split};
+use crate::{structs::scratchcard::ScratchCard};
+use std::{collections::HashSet};
 
 pub fn part_1(input: &Vec<String>) -> u64 {
     input

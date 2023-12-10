@@ -1,4 +1,4 @@
-use crate::util;
+
 
 pub fn part_1(v: &Vec<String>) -> u32 {
     v.iter().map(get_calibration_value).sum()
@@ -79,7 +79,7 @@ fn get_first_digit_from_text(s: &[u8]) -> Option<char> {
     ];
 
     let mut pos = 0;
-    let mut max_pos = s.len();
+    let max_pos = s.len();
     while pos < max_pos {
         for digit in digits {
             if s[pos..].starts_with(digit.0.as_bytes()) {
