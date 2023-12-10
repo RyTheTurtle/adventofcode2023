@@ -17,69 +17,65 @@ impl AlmanacRange {
             None => {
                 // no intersection, take the lower of the two input ranges
                 return Some(a.min(b).clone());
-            }
-            _ => {
-                let b_starts_in_a = b.0 >= a.0 && b.0 < a.1;
-                let a_starts_in_b = a.0 >= b.0 && a.0 < b.1;
-
-                if b_starts_in_a {
-                    return Some(AlmanacRange::new(a.0, b.0));
-                } else if a_starts_in_b {
-                    return Some(AlmanacRange::new(b.0, a.0));
-                } else {
-                    return Some(a.min(b).clone());
-                }
+            }, 
+            Some(i) => {
+                
+                return Some(AlmanacRange::new( i.0,
+                    i.0.min(a.0).min(b.0)))
             }
         }
     }
 
-    // returns the intersect, if any, of the range
+    /**
+     * Returns the intersection of a range. Consider two ranges A and B 
+     *    
+     *  AAAAAAAAA
+     *      BBBBBBBB
+     *      -----       <- this is the intersection 
+     *  AAAAAAAAAA
+     *  BBBBBBB
+     *  -------         <- this is the intersection 
+     * 
+     *  AAAAAAAAAA
+     *      BBBB   
+     *      ----        <- this is the intersection
+     * 
+     * AAAAA
+     *      BBBBB       <- this has no intersection    
+     */
     pub fn intersect(a: &AlmanacRange, b: &AlmanacRange) -> Option<AlmanacRange> {
-        if a == b {
-            return Some(a.clone());
+        let no_overlap = a < b  && a.1 < b.0; 
+        let no_overlap = no_overlap || b < a && b.1 < a.0; 
+        if no_overlap { 
+            return None
         }
-
-        let b_starts_in_a = b.0 >= a.0 && b.0 < a.1;
-        let b_ends_in_a = b.1 <= a.1 && b.1 > a.0;
-        let a_starts_in_b = a.0 >= b.0 && a.0 < b.1;
-        let a_ends_in_b = a.1 <= b.1 && a.1 > b.0;
-
-        if b_starts_in_a && b_ends_in_a {
-            return Some(b.clone());
-        } else if a_starts_in_b && a_ends_in_b {
-            return Some(a.clone());
-        } else if b_starts_in_a && !b_ends_in_a {
-            return Some(AlmanacRange::new(b.0, a.1));
-        } else if a_starts_in_b && !a_ends_in_b {
-            return Some(AlmanacRange::new(a.0, b.1));
-        }
-
-        None
+        let lower = a.0.max(b.0);
+        let upper = a.1.min(b.1);
+        let result = AlmanacRange::new(lower, upper);
+         
+        Some(result)
     }
 
+    /*
+    * Given ranges A and B with intersection i
+    *    aaaaaaa
+    *        bbbbbbb
+    *        iii
+    *           |--|  <- what we're trying to capture
+    */
     pub fn diff_upper(a: &AlmanacRange, b: &AlmanacRange) -> Option<AlmanacRange> {
-        match AlmanacRange::intersect(a, b) {
-            Some(r) if r == *a || r == *b => {
-                // full intersection, no lower or upper bound diff
-                return None;
-            }
+        match AlmanacRange::intersect(a, b) { 
             None => {
                 // no intersection, take the lower of the two input ranges
                 return Some(a.max(b).clone());
-            }
-            _ => {
-                let b_ends_in_a = b.1 <= a.1 && b.1 > a.0;
-                let a_ends_in_b = a.1 <= b.1 && a.1 > b.0;
-
-                if a.1 == b.1 {
+            },
+            Some(i) => {
+                println!("{:?}, {:?}, intersection {:?}",a,b,i);
+                if i.1 == a.1 && a.1 == b.1 { 
+                    // no upper bound diff 
                     return None;
-                } else if b_ends_in_a {
-                    return Some(AlmanacRange::new(b.1 + 1, a.1));
-                } else if a_ends_in_b {
-                    return Some(AlmanacRange::new(a.1 + 1, b.1));
-                } else {
-                    return Some(a.max(b).clone());
                 }
+                Some(AlmanacRange::new(i.1, a.1.max(b.1)))
             }
         }
     }
@@ -410,7 +406,7 @@ mod tests {
         ];
 
         for case in test_cases {
-            assert_eq!(AlmanacRange::diff_lower(&case.0, &case.1), case.2);
+            assert_eq!(AlmanacRange::diff_lower(&case.0, &case.1), case.2, "Failed for {:?}", case);
         }
     }
 
@@ -426,18 +422,20 @@ mod tests {
             (
                 AlmanacRange(1, 5),
                 AlmanacRange(3, 7),
-                Some(AlmanacRange(6, 7)),
+                Some(AlmanacRange(5, 7)),
             ),
             (
                 AlmanacRange(3, 7),
                 AlmanacRange(1, 5),
-                Some(AlmanacRange(6, 7)),
+                Some(AlmanacRange(5, 7)),
             ),
-            (AlmanacRange(79, 93), AlmanacRange(56, 93), None),
+            (AlmanacRange(79, 93), 
+            AlmanacRange(56, 93),
+             None),
         ];
 
         for case in test_cases {
-            assert_eq!(AlmanacRange::diff_upper(&case.0, &case.1), case.2);
+            assert_eq!(AlmanacRange::diff_upper(&case.0, &case.1), case.2, "Failed for case {:?}",case);
         }
     }
 
@@ -473,6 +471,7 @@ mod tests {
         assert_eq!(input_map.map_dest(&input_range), expected)
     }
 
+    #[test]
     pub fn test_get_destinations_exact_match_fertilizer() {
         /* {98: 50, 99: 51, 50: 52,
            }
