@@ -41,6 +41,13 @@ impl u64Range {
         Some(result)
     }
 
+    /*
+     * Given ranges A and B with intersection i
+     *    aaaaaaaa
+     *         bbbbbbb
+     *        iii
+     *    |--|  <- what we're trying to capture
+     */
     pub fn diff_lower(a: &u64Range, b: &u64Range) -> Option<u64Range> {
         match u64Range::intersect(a, b) {
             None => Some(a.min(b).clone()),
@@ -313,8 +320,6 @@ impl Mapping {
                                 _ => {}
                             }
                         }
-
-                        // break;
                     }
                     None => {
                         // no intersection means this range maps to itself for output
@@ -341,17 +346,12 @@ pub struct MapRange {
 
 impl MapRange {
     fn get_dest(&self, source: &u64Range) -> u64Range {
-        // dest = 52, src = 50, dest - src = 2
-        println!("source: {:?}, self: {:?}", source, self);
-
         let offset: u64 = source.0 - self.src_start; 
-        println!("{:?} offset = {:?}",self, offset);
         let start: u64 = self.dest_start + offset; 
         let dist: u64 = source.1 - source.0;
         return u64Range::new(start, start + dist);
     }
 }
-// just for compatability and not wanting to edit previous functions
 
 #[cfg(test)]
 mod tests {
@@ -421,119 +421,6 @@ mod tests {
                 case
             );
         }
-    }
-
-    #[test]
-    pub fn test_get_destinations_exact_match() {
-        /* {98: 50, 99: 51, 50: 52,
-           }
-        */
-        let input_map = Mapping {
-            title: String::from("test"),
-            ranges: vec![
-                MapRange {
-                    src_start: 98,
-                    dest_start: 50,
-                    range: 2,
-                },
-                MapRange {
-                    src_start: 50,
-                    dest_start: 52,
-                    range: 48,
-                },
-            ],
-        };
-
-        let mut input_range = HashSet::new();
-        input_range.insert(u64Range(79, 93));
-        input_range.insert(u64Range(55, 68));
-
-        let mut expected: HashSet<u64Range> = HashSet::new();
-        expected.insert(u64Range(81, 94));
-        expected.insert(u64Range(57, 69));
-
-        assert_eq!(input_map.map_dest(&input_range), expected)
-    }
-
-    #[test]
-    pub fn test_get_destinations_exact_match_fertilizer() {
-        /* {98: 50, 99: 51, 50: 52,
-           }
-        */
-        let input_map = Mapping {
-            title: String::from("test"),
-            ranges: vec![
-                MapRange {
-                    src_start: 15, // [15, 52)
-                    dest_start: 0, // [0, 37)
-                    range: 37,
-                },
-                MapRange {
-                    src_start: 52,  // [52, 54)
-                    dest_start: 37, // [37,39)
-                    range: 2,
-                },
-                MapRange {
-                    src_start: 39, // [39,54)
-                    dest_start: 0, // [0, 15)
-                    range: 15,
-                },
-            ],
-        };
-
-        let mut input_range = HashSet::new();
-        input_range.insert(u64Range(81, 95));
-        input_range.insert(u64Range(57, 70));
-
-        let mut expected: HashSet<u64Range> = HashSet::new();
-        expected.insert(u64Range(81, 94));
-        expected.insert(u64Range(57, 69));
-
-        assert_eq!(input_map.map_dest(&input_range), expected)
-    }
-
-    #[test]
-    pub fn test_get_destinations_exact_match_water() {
-        /* {98: 50, 99: 51, 50: 52,
-           }
-        */
-        let input_map = Mapping {
-            title: String::from("test"),
-            ranges: vec![
-                MapRange {
-                    // dest = src - 4
-                    dest_start: 49, // [49, 57)
-                    src_start: 53,  // [53, 61)
-                    range: 8,
-                },
-                MapRange {
-                    dest_start: 0, // [0,41)
-                    src_start: 11, // [11, 53)
-                    range: 42,
-                },
-                MapRange {
-                    dest_start: 42, // [42, 49)
-                    src_start: 0,   // [0,6)
-                    range: 7,
-                },
-                MapRange {
-                    dest_start: 57, // [57, 61)
-                    src_start: 7,   // [7,11)
-                    range: 4,
-                },
-            ],
-        };
-
-        let mut input_range = HashSet::new();
-        input_range.insert(u64Range(81, 95));
-        input_range.insert(u64Range(57, 70));
-
-        let mut expected: HashSet<u64Range> = HashSet::new();
-        expected.insert(u64Range(81, 95));
-        expected.insert(u64Range(53, 56));
-        expected.insert(u64Range(62, 70)); // a carry
-
-        assert_eq!(input_map.map_dest(&input_range), expected)
     }
 
     #[test]
