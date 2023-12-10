@@ -1,4 +1,4 @@
-use crate::structs::almanac::{Almanac, AlmanacRange, MapRange, Mapping, RangedAlmanac};
+use crate::structs::almanac::{Almanac, u64Range, MapRange, Mapping, RangedAlmanac};
 use std::{collections::HashSet, time::Instant};
 
 pub fn part_1(input: &Vec<String>) -> u64 {
@@ -33,7 +33,7 @@ pub fn part_1(input: &Vec<String>) -> u64 {
  */
 pub fn part_2(input: &Vec<String>) -> u64 {
     let ranged_almanac: RangedAlmanac = RangedAlmanac::from(input);
-    let mut ranges: HashSet<AlmanacRange> = HashSet::new();
+    let mut ranges: HashSet<u64Range> = HashSet::new();
     // set the initial ranges as the seed ranges from the almanac
     for seed in ranged_almanac.seeds {
         ranges.insert(seed);
