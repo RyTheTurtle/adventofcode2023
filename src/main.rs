@@ -1,6 +1,7 @@
 use std::time::Instant;
 
 mod day1;
+mod day10;
 mod day2;
 mod day3;
 mod day4;
@@ -66,6 +67,11 @@ fn main() {
         8 => match part {
             1 => day8::part_1(&input),
             2 => day8::part_2(&input),
+            _ => panic!("Invalid part"),
+        },
+        10 => match part {
+            1 => day10::part_1(&input),
+            2 => day10::part_2(&input),
             _ => panic!("Invalid part"),
         },
         _ => 0,
