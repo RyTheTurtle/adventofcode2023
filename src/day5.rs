@@ -1,5 +1,5 @@
-use crate::structs::almanac::{Almanac, u64Range, MapRange, Mapping, RangedAlmanac};
-use std::{collections::HashSet};
+use crate::structs::almanac::{Almanac, MapRange, Mapping, RangedAlmanac, U64range};
+use std::collections::HashSet;
 
 pub fn part_1(input: &Vec<String>) -> u64 {
     let almanac = Almanac::from(input);
@@ -7,9 +7,7 @@ pub fn part_1(input: &Vec<String>) -> u64 {
     for seed in almanac.seeds {
         let mut value = seed;
         for map in &almanac.maps {
-            // println!("Finding {:?} in {:?}",value,map.title);
             value = next(&map, value);
-            // println!("  Result: {:?}", value);
         }
         if value < lowest {
             lowest = value;
@@ -33,12 +31,11 @@ pub fn part_1(input: &Vec<String>) -> u64 {
  */
 pub fn part_2(input: &Vec<String>) -> u64 {
     let ranged_almanac: RangedAlmanac = RangedAlmanac::from(input);
-    let mut ranges: HashSet<u64Range> = HashSet::new();
+    let mut ranges: HashSet<U64range> = HashSet::new();
     // set the initial ranges as the seed ranges from the almanac
     for seed in ranged_almanac.seeds {
         ranges.insert(seed);
     }
-    println!("Starting ranges: {:?}", ranges);
 
     let mut almanac_map_iter = ranged_almanac.maps.iter();
     loop {
@@ -51,7 +48,6 @@ pub fn part_2(input: &Vec<String>) -> u64 {
             }
         }
     }
-    println!("Ranges: {:?}", ranges);
     return ranges.into_iter().min().unwrap().0;
 }
 

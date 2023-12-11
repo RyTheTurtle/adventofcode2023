@@ -1,5 +1,3 @@
-
-
 pub fn part_1(v: &Vec<String>) -> u32 {
     v.iter().map(get_calibration_value).sum()
 }

@@ -1,6 +1,5 @@
 use crate::structs::game::{Game, GameCubeCount, Round};
 
-
 pub fn part_1(input: &Vec<String>) -> u32 {
     input
         .into_iter()

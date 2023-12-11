@@ -1,18 +1,5 @@
-use crate::util;
 use regex::Regex;
 use std::{collections::HashMap, time::Instant};
-
-pub fn solve() {
-    println!("Day 8\n====");
-    let input = util::read_lines("./input/8.txt");
-    println!("Input line size: {}", input.len());
-    println!("Part 1\n---");
-    let part1 = part_1(&input);
-    println!("Result: {}", part1);
-    println!("Part 2\n---");
-    let part2 = part_2(&input);
-    println!("Result: {}\n====", part2);
-}
 
 #[derive(Debug)]
 struct Map {
@@ -79,8 +66,8 @@ fn count_steps_to_end(map: &Map, start: &String, end_strategy: fn(&String) -> bo
 }
 
 pub fn part_1(input: &Vec<String>) -> u64 {
-    let desertMap: Map = parse_map(input);
-    return count_steps_to_end(&desertMap, &String::from("AAA"), ending_all_z_strategy);
+    let desert_map: Map = parse_map(input);
+    return count_steps_to_end(&desert_map, &String::from("AAA"), ending_all_z_strategy);
 }
 
 fn get_factors(n: u64) -> Vec<u64> {

@@ -1,5 +1,5 @@
 use crate::structs::camel_card::{compare_bid, parse_bid, parse_hand, Bid, CamelCard, HandType};
-use std::{collections::HashSet};
+use std::collections::HashSet;
 
 fn rank(h: &Vec<CamelCard>) -> HandType {
     let unique_cards: HashSet<&CamelCard> = HashSet::from_iter(h.iter());

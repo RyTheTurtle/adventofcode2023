@@ -1,6 +1,5 @@
 use crate::util;
 
-
 pub fn part_1(input: &Vec<String>) -> u64 {
     // parse inputs
     let times = util::parse_number_vec_following_colon(&input[0]);

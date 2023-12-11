@@ -5,11 +5,11 @@ use std::collections::HashSet;
  */
 
 #[derive(Debug, Copy, Clone, PartialEq, PartialOrd, Eq, Ord, Hash)]
-pub struct u64Range(pub u64, pub u64);
+pub struct U64range(pub u64, pub u64);
 
-impl u64Range {
-    pub fn new(a: u64, b: u64) -> u64Range {
-        u64Range(a.min(b), a.max(b))
+impl U64range {
+    pub fn new(a: u64, b: u64) -> U64range {
+        U64range(a.min(b), a.max(b))
     }
     /**
      * Returns the intersection of a range. Consider two ranges A and B
@@ -28,7 +28,7 @@ impl u64Range {
      * AAAAA
      *      BBBBB       <- this has no intersection    
      */
-    pub fn intersect(a: &u64Range, b: &u64Range) -> Option<u64Range> {
+    pub fn intersect(a: &U64range, b: &U64range) -> Option<U64range> {
         let no_overlap = a < b && a.1 <= b.0;
         let no_overlap = no_overlap || b < a && b.1 <= a.0;
         if no_overlap {
@@ -36,7 +36,7 @@ impl u64Range {
         }
         let lower = a.0.max(b.0);
         let upper = a.1.min(b.1);
-        let result = u64Range::new(lower, upper);
+        let result = U64range::new(lower, upper);
 
         Some(result)
     }
@@ -48,14 +48,14 @@ impl u64Range {
      *        iii
      *    |--|  <- what we're trying to capture
      */
-    pub fn diff_lower(a: &u64Range, b: &u64Range) -> Option<u64Range> {
-        match u64Range::intersect(a, b) {
+    pub fn diff_lower(a: &U64range, b: &U64range) -> Option<U64range> {
+        match U64range::intersect(a, b) {
             None => Some(a.min(b).clone()),
             Some(i) => {
                 if i.0 == a.0 && a.0 == b.0 {
                     return None;
                 }
-                Some(u64Range::new(i.0.min(a.0).min(b.0), i.0))
+                Some(U64range::new(i.0.min(a.0).min(b.0), i.0))
             }
         }
     }
@@ -67,8 +67,8 @@ impl u64Range {
      *        iii
      *           |--|  <- what we're trying to capture
      */
-    pub fn diff_upper(a: &u64Range, b: &u64Range) -> Option<u64Range> {
-        match u64Range::intersect(a, b) {
+    pub fn diff_upper(a: &U64range, b: &U64range) -> Option<U64range> {
+        match U64range::intersect(a, b) {
             None => Some(a.max(b).clone()),
 
             Some(i) => {
@@ -76,7 +76,7 @@ impl u64Range {
                     // no upper bound diff
                     return None;
                 }
-                Some(u64Range::new(i.1, a.1.max(b.1)))
+                Some(U64range::new(i.1, a.1.max(b.1)))
             }
         }
     }
@@ -150,7 +150,7 @@ impl Almanac {
 
 #[derive(Debug)]
 pub struct RangedAlmanac {
-    pub seeds: Vec<u64Range>,
+    pub seeds: Vec<U64range>,
     pub maps: Vec<Mapping>,
 }
 
@@ -179,12 +179,12 @@ impl RangedAlmanac {
             .split_ascii_whitespace()
             .map(|s| s.parse::<u64>().unwrap())
             .collect();
-        let mut seeds: Vec<u64Range> = Vec::new();
+        let mut seeds: Vec<U64range> = Vec::new();
         let mut seed_iter = seed_ranges.iter();
         loop {
             match seed_iter.next() {
                 Some(start) => match seed_iter.next() {
-                    Some(range) => seeds.push(u64Range(*start, start.checked_add(*range).unwrap())),
+                    Some(range) => seeds.push(U64range(*start, start.checked_add(*range).unwrap())),
                     None => panic!("invalid seed range"),
                 },
                 None => break,
@@ -255,26 +255,26 @@ impl Mapping {
      * Values that are not mapped to something new from this mapping are output
      * as a range of value that are the same as the input.
      */
-    pub fn map_dest(&self, sources: &HashSet<u64Range>) -> HashSet<u64Range> {
+    pub fn map_dest(&self, sources: &HashSet<U64range>) -> HashSet<U64range> {
         // populate stack
-        let mut range_stack: Vec<u64Range> = Vec::new();
-        let mut already_processed: HashSet<u64Range> = HashSet::new();
-        let mut results: HashSet<u64Range> = HashSet::new();
+        let mut range_stack: Vec<U64range> = Vec::new();
+        let mut already_processed: HashSet<U64range> = HashSet::new();
+        let mut results: HashSet<U64range> = HashSet::new();
         for range in sources.clone() {
             range_stack.push(range);
         }
         // process items off the stack
         while range_stack.len() > 0 {
             let current_range = range_stack.pop().unwrap();
-            println!(
-                "map_dest({:?}) Evaluating input range {:?}",
-                self.title, current_range
-            );
+            // println!(
+            //     "map_dest({:?}) Evaluating input range {:?}",
+            //     self.title, current_range
+            // );
 
             // just in case we end up with some duplicate ranges showing up
             match already_processed.get(&current_range) {
-                Some(r) => {
-                    println!("\tAlready processed range {:?}", r);
+                Some(_) => {
+                    // println!("\tAlready processed range {:?}", r);
                     continue;
                 }
                 None => {
@@ -284,37 +284,37 @@ impl Mapping {
 
             let mut found_intersection = false;
             for mr in &self.ranges {
-                let map_range = u64Range::new(mr.src_start, mr.src_start + mr.range);
-                println!("\tChecking map range {:?}", map_range);
-                let intersection = u64Range::intersect(&map_range, &current_range);
-                let lower_diff = u64Range::diff_lower(&map_range, &current_range);
-                let upper_diff = u64Range::diff_upper(&map_range, &current_range);
+                let map_range = U64range::new(mr.src_start, mr.src_start + mr.range);
+                // println!("\tChecking map range {:?}", map_range);
+                let intersection = U64range::intersect(&map_range, &current_range);
+                let lower_diff = U64range::diff_lower(&map_range, &current_range);
+                let upper_diff = U64range::diff_upper(&map_range, &current_range);
                 match intersection {
                     Some(r) => {
                         // intersection is mapped to destination result
-                        println!("\tFound intersection {:?}", r);
+                        // println!("\tFound intersection {:?}", r);
                         found_intersection = true;
                         let output_range = mr.get_dest(&r);
                         results.insert(output_range);
 
                         if current_range != r {
-                            println!("\tcurrent range is not fully enclosed in map range");
+                            // println!("\tcurrent range is not fully enclosed in map range");
                             match lower_diff {
                                 Some(d) if current_range.0 < map_range.0 => {
-                                    println!(
-                                        "\tpushing unmatched lower range {:?} to processing stack",
-                                        d
-                                    );
+                                    // println!(
+                                    //     "\tpushing unmatched lower range {:?} to processing stack",
+                                    //     d
+                                    // );
                                     range_stack.push(d);
                                 }
                                 _ => {}
                             }
                             match upper_diff {
                                 Some(d) if current_range.0 > map_range.0 => {
-                                    println!(
-                                        "\tpushing unmatched upper range {:?} to processing stack",
-                                        d
-                                    );
+                                    // println!(
+                                    //     "\tpushing unmatched upper range {:?} to processing stack",
+                                    //     d
+                                    // );
                                     range_stack.push(d);
                                 }
                                 _ => {}
@@ -329,7 +329,7 @@ impl Mapping {
             }
             if !found_intersection {
                 // range didn't map to any inputs
-                println!("\tNo intersection found with current range, ");
+                // println!("\tNo intersection found with current range, ");
                 results.insert(current_range);
             }
         }
@@ -345,11 +345,11 @@ pub struct MapRange {
 }
 
 impl MapRange {
-    fn get_dest(&self, source: &u64Range) -> u64Range {
-        let offset: u64 = source.0 - self.src_start; 
-        let start: u64 = self.dest_start + offset; 
+    fn get_dest(&self, source: &U64range) -> U64range {
+        let offset: u64 = source.0 - self.src_start;
+        let start: u64 = self.dest_start + offset;
         let dist: u64 = source.1 - source.0;
-        return u64Range::new(start, start + dist);
+        return U64range::new(start, start + dist);
     }
 }
 
@@ -359,43 +359,43 @@ mod tests {
 
     #[test]
     pub fn new_range_right_order() {
-        assert_eq!(u64Range::new(4, 2), u64Range(2, 4));
+        assert_eq!(U64range::new(4, 2), U64range(2, 4));
     }
 
     #[test]
     pub fn test_range_ordering() {
-        assert!(u64Range(2, 3) < u64Range(2, 4));
-        assert!(u64Range(2, 3) == u64Range(2, 3));
-        assert!(u64Range(1, 3) < u64Range(2, 5));
-        assert!(u64Range(1, 5) > u64Range(0, 5));
+        assert!(U64range(2, 3) < U64range(2, 4));
+        assert!(U64range(2, 3) == U64range(2, 3));
+        assert!(U64range(1, 3) < U64range(2, 5));
+        assert!(U64range(1, 5) > U64range(0, 5));
     }
 
     #[test]
     pub fn test_intersect() {
         let test_cases = [
-            (u64Range(1, 5), u64Range(3, 5), Some(u64Range(3, 5))),
-            (u64Range(98, 99), u64Range(79, 93), None),
-            (u64Range(1, 5), u64Range(3, 7), Some(u64Range(3, 5))),
-            (u64Range(3, 7), u64Range(1, 5), Some(u64Range(3, 5))),
+            (U64range(1, 5), U64range(3, 5), Some(U64range(3, 5))),
+            (U64range(98, 99), U64range(79, 93), None),
+            (U64range(1, 5), U64range(3, 7), Some(U64range(3, 5))),
+            (U64range(3, 7), U64range(1, 5), Some(U64range(3, 5))),
         ];
 
         for case in test_cases {
-            assert_eq!(u64Range::intersect(&case.0, &case.1), case.2);
+            assert_eq!(U64range::intersect(&case.0, &case.1), case.2);
         }
     }
 
     #[test]
     pub fn test_diff_lower() {
         let test_cases = [
-            (u64Range(1, 5), u64Range(3, 5), Some(u64Range(1, 3))),
-            (u64Range(98, 99), u64Range(79, 93), Some(u64Range(79, 93))),
-            (u64Range(1, 5), u64Range(3, 7), Some(u64Range(1, 3))),
-            (u64Range(3, 7), u64Range(1, 5), Some(u64Range(1, 3))),
+            (U64range(1, 5), U64range(3, 5), Some(U64range(1, 3))),
+            (U64range(98, 99), U64range(79, 93), Some(U64range(79, 93))),
+            (U64range(1, 5), U64range(3, 7), Some(U64range(1, 3))),
+            (U64range(3, 7), U64range(1, 5), Some(U64range(1, 3))),
         ];
 
         for case in test_cases {
             assert_eq!(
-                u64Range::diff_lower(&case.0, &case.1),
+                U64range::diff_lower(&case.0, &case.1),
                 case.2,
                 "Failed for {:?}",
                 case
@@ -406,16 +406,16 @@ mod tests {
     #[test]
     pub fn test_diff_upper() {
         let test_cases = [
-            (u64Range(1, 5), u64Range(3, 5), None),
-            (u64Range(98, 99), u64Range(79, 93), Some(u64Range(98, 99))),
-            (u64Range(1, 5), u64Range(3, 7), Some(u64Range(5, 7))),
-            (u64Range(3, 7), u64Range(1, 5), Some(u64Range(5, 7))),
-            (u64Range(79, 93), u64Range(56, 93), None),
+            (U64range(1, 5), U64range(3, 5), None),
+            (U64range(98, 99), U64range(79, 93), Some(U64range(98, 99))),
+            (U64range(1, 5), U64range(3, 7), Some(U64range(5, 7))),
+            (U64range(3, 7), U64range(1, 5), Some(U64range(5, 7))),
+            (U64range(79, 93), U64range(56, 93), None),
         ];
 
         for case in test_cases {
             assert_eq!(
-                u64Range::diff_upper(&case.0, &case.1),
+                U64range::diff_upper(&case.0, &case.1),
                 case.2,
                 "Failed for case {:?}",
                 case
@@ -430,8 +430,8 @@ mod tests {
             src_start: 50,
             range: 10,
         };
-        let src: u64Range = u64Range::new(51, 55);
-        let expected: u64Range = u64Range::new(53, 57);
+        let src: U64range = U64range::new(51, 55);
+        let expected: U64range = U64range::new(53, 57);
         assert_eq!(input.get_dest(&src), expected);
     }
 }

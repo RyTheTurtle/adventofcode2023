@@ -39,7 +39,7 @@ impl PointHistory {
         let stack = self.get_extrapolation_diffs();
         println!("{:?}", stack);
         let mut result = 0;
-        let mut previous = 0;
+        let mut previous: i64;
         for extrapolation in stack.iter().rev() {
             previous = result;
             result = extrapolation.first().unwrap() - previous;
