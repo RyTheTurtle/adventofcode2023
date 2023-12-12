@@ -90,12 +90,15 @@ pub fn part_2(input: &Vec<String>) -> u64 {
                 not_enclosed_cells.extend(valid_path.cells);
             }
             None => {
-                if !pipe_cells.contains(&coordinate) {
+                if !pipe_cells.contains(&coordinate)  {
                     enclosed_cells.insert(coordinate);
-                }
+                } 
             }
         }
     }
+    // as a sanity check, filter out enclosed cells from things 
+    // found to be not fully enclosed 
+    let enclosed_cells:HashSet<&(usize,usize)> = enclosed_cells.iter().filter(|c| !not_enclosed_cells.contains(c)).collect();
     println!("Enclosed cells: {:?}", enclosed_cells);
     println!("Not enclosed cells: {:?}", not_enclosed_cells);
     enclosed_cells.len() as u64
@@ -111,7 +114,7 @@ fn dfs_to_outside_maze(
     println!("dfs: path: {:?}", path);
     println!("\tBlocked cells: {:?}", blocked);
     println!("\tValidated cells: {:?}", validated);
-    
+    println!("\tPipe cells: {:?}", pipe);
     let current_cell = path
         .cells
         .last()
@@ -126,6 +129,7 @@ fn dfs_to_outside_maze(
     }
     // end condition: we've hit a pipe and cannot proceed further
     if pipe.contains(current_cell) {
+        println!("{:?} is part of the pipe", current_cell);
         return None;
     }
     // end condition: we've reached a point outside of the map
@@ -160,7 +164,7 @@ fn dfs_to_outside_maze(
             None => continue,
         }
     }
-
+    println!("{:?} DFS'd to end of method without hitting a known terminal condition",current_cell);
     None
 }
 
@@ -214,4 +218,45 @@ fn get_adj_coords(start: &(usize, usize)) -> Vec<(isize, isize)> {
         .collect();
     println!("\tAdj cells: {:?}", adjacent_coords);
     adjacent_coords
+}
+
+/**
+ * Need to check if something has no path outside of the maze 
+ * but is also boxed outside of the maze pipe. this is a weird
+ * edge case where a starting cell has no path to exit the maze,
+ * but they're also not boxed in the pipe
+ */
+fn is_boxed_out_of_maze(
+    maze: &Maze,
+    cell: &(usize, usize)) -> bool { 
+    // create two lookup tables where the i'th transform maps to the i'th list of blocker pipes
+    let transforms: Vec<(isize,isize)> = vec![(-1,0), (1,0), (0,-1), (0,1) ];
+    let blocker_pipes: Vec<Vec<char>> = vec![
+        vec!['-','L','J'],
+        vec!['-','F','7'],
+        vec!['|','J','7'],
+        vec!['|', 'F', 'L']
+    ];
+    for (i, transform) in transforms.iter().enumerate() { 
+        let adj_coord: (isize, isize) = (cell.0 as isize + transform.0, cell.1 as isize + transform.1);
+        // if an adjacent coordinate is out of the maze, 
+        // by definition it's not boxed in to anything since it can 
+        // reach the outside of the maze 
+        if adj_coord.0 < 0 || adj_coord.1 < 0 {
+            return false;
+        }
+        let valid_blockers = blocker_pipes.get(i).expect("should be evenly aligned with transforms");
+        let adj_coord_usize = (adj_coord.0 as usize, adj_coord.1 as usize);
+        match maze.get(adj_coord_usize.0, adj_coord_usize.1) { 
+            None => { // can reach the outside of the maze, not boxed in 
+                return false;
+            }, 
+            Some(c) => { 
+                if !valid_blockers.contains(c) { 
+                    return false; 
+                }
+            }
+        }
+    }
+    true
 }
