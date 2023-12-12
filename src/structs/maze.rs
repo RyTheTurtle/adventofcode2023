@@ -1,7 +1,7 @@
 /*
 Maze struct used for day 10
  */
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Maze {
     cells: Vec<char>,
     row_len: usize,
@@ -16,6 +16,16 @@ impl Maze {
             row_len: row_len,
             cells: cells,
         }
+    }
+
+    /** enumerates all valid coordinates in the grid
+     */
+    pub fn list_coordinates(&self) -> Vec<(usize, usize)> {
+        let mut result: Vec<(usize, usize)> = Vec::new();
+        for i in 0..self.cells.len() {
+            result.push((i / self.row_len, i % self.row_len));
+        }
+        result
     }
 
     // helper function to get value at a coordinate

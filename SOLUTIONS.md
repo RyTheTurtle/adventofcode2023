@@ -157,3 +157,26 @@ If this is true ( which is is for the given problem input), the answer to how ma
 
  ### Part 2 
  Same here, the only difference for extrapolating backwards is looking at the first element in the `Vec` of diffs at each stage instead of the last one, and making sure to subtract the values between each step in the calculation for the extrapolation rather than adding. 
+
+ ## Day 10 
+ ### Part 1
+ For this problem we can take several assumptions given to us about the input to come up with a strategy
+ 1. there is a valid starting point 'S'
+ 2. there are exactly two valid connecting pipes to each cell in the grid that is part of the pipe 
+ 3. the 'pipe' makes a closed loop, so if we start two paths traversing the opposite directions away from the starting point, they will eventually collide. 
+
+Since we need to find the farthest point, the approach here is to do a breadth-first-search of the pipe until we hit a collision, and then find the point that has the farthest distance recorded. In addition to the standard BFS algorithm, we have to check at each point in the paths only for valid adjacent pipes to make sure we're actually on the right pipe path. To do this, given that we know which character corresponds to what type of pipe, we can do the following 
+1. for current cell `c`, look up the possible valid adjacent cells to `c` 
+2. get the values of the valid adjacent cells to our current cell, refer to them as `a`
+3. for every `a`, look up valid adjacent cells for `a` to see if `c` is a valid adjacent cell to `a`
+
+this ensures we're only traversing paths for cells that are properly connected pipes. To get the valid adjacent cells, I just hardcoded lists of deltas for valid adjacent cells based on the pipe type (vertical, left bend, right bend, etc). Once we have a couple helper functions to find the valid adjacent cells to a given cell, the rest of the implementation of part 1 is a standard BFS 
+
+### Part 2
+This one is a bit trickier because we have to first identify the path of the pipe and then check each non-pipe cell to see if it's possible to exit the maze (eg make it to the border) without being blocked. My initial thought is to take the following approach: 
+1. identify the cells that have pipe coordinates. 
+2. for every non-pipe coordinate, do a DFS with the following end conditions 
+    1. we find one coordinate that is at the edge of the grid (we found a valid exit)
+    2. we cannot make any more movements without hitting pipes
+
+To make this more efficient, I'll memoize (keep track of) which cells I've found that are already proven to be able to make it to the outside of the maze. That way, for each path I check, if it can reach a cell that we already know is not trapped by the pipe, we can assume all cells in that path are able to make it out of the maze. This should dramatically reduce the amount of work we need to do in order to validate the entire maze.
