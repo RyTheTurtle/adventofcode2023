@@ -75,25 +75,7 @@ pub fn part_2(input: &Vec<String>) -> u64 {
             match ray_iter.next() { 
                 Some(c) if pipe_cells.contains(c) => { 
                     println!("\tIntersection of pipe starting at {:?}",c);
-                    let mut is_real_intersect = true;
-                    let mut next_point = c;
-                    loop {
-                        match ray_iter.next(){
-                            Some(p) if !pipe_cells.contains(p) => {
-                                break;
-                            },
-                            Some(_) => {
-                                // we hit a horizontal section of pipe, don't count as intersection
-                                is_real_intersect = false;
-                            },
-                            None => {break;}
-                        }
-                    }
-                    if is_real_intersect {
-                        intersections += 1;
-                    } else {
-                        println!("\tNot a real intersection, since intersecting a horizontal part of pipe");
-                    }
+                    println!("\tFIXME detect and don't double count intersecting a horizontal line");
                 },
                 Some(_) => {},
                 None => {
