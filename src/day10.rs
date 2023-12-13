@@ -48,13 +48,6 @@ pub fn part_1(input: &Vec<String>) -> u64 {
     *distances.values().max().unwrap() as u64
 }
 
-/**
- * Need to find the area of cells enclosed in the loop.
- * - DFS to find the actual path for the loop
- * - for every non pipe piont, BFS until we either
- *   1. reach edge of maze (not contained)
- *   2. reach only pipes, (all points in here are contained in maze)
- */
 pub fn part_2(input: &Vec<String>) -> u64 {
     let maze = Maze::from(input);
     let start = maze
@@ -64,27 +57,44 @@ pub fn part_2(input: &Vec<String>) -> u64 {
     let pipe_path: MazePath = get_pipe_path(&maze, &start);
 
     let pipe_cells: HashSet<(usize, usize)> = HashSet::from_iter(pipe_path.cells);
-    let rays: Vec<Vec<(usize,usize)>> = maze.list_coordinates().iter()
-    .filter(|c| !pipe_cells.contains(c)).map(|c| get_ray(c, &maze)).collect();
+    let rays: Vec<Vec<(usize, usize)>> = maze
+        .list_coordinates()
+        .iter()
+        .filter(|c| !pipe_cells.contains(c))
+        .map(|c| get_ray(c, &maze))
+        .collect();
     let mut count = 0;
+
     for ray in rays {
-        println!("Ray: {:?}",ray);
-        let mut intersections = 0;
+        let mut north_south_intersections = (0, 0);
         let mut ray_iter = ray.iter();
-        loop{
-            match ray_iter.next() { 
-                Some(c) if pipe_cells.contains(c) => { 
-                    println!("\tIntersection of pipe starting at {:?}",c);
-                    println!("\tFIXME detect and don't double count intersecting a horizontal line");
-                },
-                Some(_) => {},
-                None => {
-                    if intersections % 2 == 1 {
-                        count += 1;
+        loop {
+            match ray_iter.next() {
+                Some(c) if pipe_cells.contains(c) => {
+                    if is_north(&maze.get(c.0, c.1).unwrap()) {
+                        north_south_intersections.0 += 1;
                     }
+                    if is_south(&maze.get(c.0, c.1).unwrap()) {
+                        north_south_intersections.1 += 1;
+                    }
+                }
+                Some(_) => {}
+                None => {
                     break;
                 }
             }
+        }
+        if north_south_intersections > (0, 0) {
+            println!("Ray: {:?}", ray);
+            println!("North/South intersections: {:?}", north_south_intersections);
+        }
+        if north_south_intersections
+            .0
+            .min(north_south_intersections.1)
+            % 2
+            == 1
+        {
+            count += 1;
         }
     }
     count as u64
@@ -125,22 +135,34 @@ fn get_pipe_path(maze: &Maze, start: &(usize, usize)) -> MazePath {
         }
     }
     pipe_path
-} 
+}
 
-fn get_ray(c: &(usize,usize), maze: &Maze) -> Vec<(usize,usize)> { 
-    let mut result: Vec<(usize,usize)> = Vec::new();
+fn get_ray(c: &(usize, usize), maze: &Maze) -> Vec<(usize, usize)> {
+    let mut result: Vec<(usize, usize)> = Vec::new();
     let mut dist = 0;
     loop {
-        match maze.get(c.0, c.1+dist) {
+        match maze.get(c.0, c.1 + dist) {
             Some(_) => {
-                result.push((c.0, c.1+dist));
-            },
+                result.push((c.0, c.1 + dist));
+            }
             None => {
                 break;
             }
         }
         dist += 1;
-
     }
     result
+}
+
+fn is_north(c: &char) -> bool {
+    match c {
+        '|' | 'L' | 'J' => true,
+        _ => false,
+    }
+}
+fn is_south(c: &char) -> bool {
+    match c {
+        '|' | '7' | 'F' => true,
+        _ => false,
+    }
 }
