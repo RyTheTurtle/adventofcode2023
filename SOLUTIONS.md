@@ -173,10 +173,14 @@ Since we need to find the farthest point, the approach here is to do a breadth-f
 this ensures we're only traversing paths for cells that are properly connected pipes. To get the valid adjacent cells, I just hardcoded lists of deltas for valid adjacent cells based on the pipe type (vertical, left bend, right bend, etc). Once we have a couple helper functions to find the valid adjacent cells to a given cell, the rest of the implementation of part 1 is a standard BFS 
 
 ### Part 2
-This one is a bit trickier because we have to first identify the path of the pipe and then check each non-pipe cell to see if it's possible to exit the maze (eg make it to the border) without being blocked. My initial thought is to take the following approach: 
-1. identify the cells that have pipe coordinates. 
-2. for every non-pipe coordinate, do a DFS with the following end conditions 
-    1. we find one coordinate that is at the edge of the grid (we found a valid exit)
-    2. we cannot make any more movements without hitting pipes
+My initial approach was to perform a depth-first search (DFS) from every coordinate to the boundary of the grid to find which points did not have a valid path to the end of the grid. This approach basically follows the following steps
+1. collect list of all pipe points in the path, same as part 1 just we don't care about distances from the start.
+2. take every point in the grid that is not in the pipe path and DFS to the edge of the grid 
+   1. valid DFS moves are any direction as long as the move doesn't intersect the pipe path 
+3. count the points which have no valid route to the edge of the grid. 
 
-To make this more efficient, I'll memoize (keep track of) which cells I've found that are already proven to be able to make it to the outside of the maze. That way, for each path I check, if it can reach a cell that we already know is not trapped by the pipe, we can assume all cells in that path are able to make it out of the maze. This should dramatically reduce the amount of work we need to do in order to validate the entire maze.
+This mostly worked except for edge cases where some points were prevented from having a valid path to the edge of the grid but also were not enclosed in the main loop. This comes up when there's a very windy pipe path. 
+
+After researching and consulting peers working on this, I learned about the approach of ray casting. Basically, this means you iterate over every point, "cast a ray" infinitely right to the end of the maze, and count the number of intersections of this ray with the pipe path. Then take the minimum value of the intersection of north or south bound intersections and if the number is odd, that means the point is enclosed in the loop. 
+
+"casting a ray" basically means build a list of points extending in a direction (here, it's horizontally right) from the starting point to the end of the grid boundary. So in a 5x5 grid, the ray from piont `(1,1)`  to the end of the grid is `[(1,1), (1,2), (1,3),(1,4)]`. This approach properly accounts for weird pipe shapes and lets us get the answer. 
