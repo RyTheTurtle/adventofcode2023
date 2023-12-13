@@ -1,7 +1,6 @@
 use crate::structs::maze::{Maze, MazePath};
 use std::{
     collections::{HashMap, HashSet, VecDeque},
-    thread::current,
     vec,
 };
 
@@ -65,107 +64,48 @@ pub fn part_2(input: &Vec<String>) -> u64 {
     let pipe_path: MazePath = get_pipe_path(&maze, &start);
 
     let pipe_cells: HashSet<(usize, usize)> = HashSet::from_iter(pipe_path.cells);
-    let mut not_enclosed_cells: HashSet<(usize, usize)> = HashSet::new();
-    let mut enclosed_cells: HashSet<(usize, usize)> = HashSet::new();
-
-    // DFS every cell in the grid to determine if it can escape or not. If a cell on a DFS path
-    // hits a cell that we know is not enclosed, we can stop early and assume it and all cells
-    // on the current path are able to escape. Likewise, if we hit a cell that we've already determined
-    // is enclosed, then we can assume the entire path of cells we've checked are also enclosed.
-    for coordinate in maze.list_coordinates() {
-        println!("checking coordinate {:?}", coordinate);
-        let path = MazePath {
-            cells: vec![coordinate],
-        };
-
-        match dfs_to_outside_maze(
-            &maze,
-            path,
-            &enclosed_cells,
-            &not_enclosed_cells,
-            &pipe_cells,
-        ) {
-            Some(valid_path) => {
-                // we found a way out, add to not enclosed cells
-                not_enclosed_cells.extend(valid_path.cells);
+    let rays: Vec<Vec<(usize,usize)>> = maze.list_coordinates().iter()
+    .filter(|c| !pipe_cells.contains(c)).map(|c| get_ray(c, &maze)).collect();
+    let mut count = 0;
+    for ray in rays {
+        println!("Ray: {:?}",ray);
+        let mut intersections = 0;
+        let mut ray_iter = ray.iter();
+        loop{
+            match ray_iter.next() { 
+                Some(c) if pipe_cells.contains(c) => { 
+                    println!("\tIntersection of pipe starting at {:?}",c);
+                    let mut is_real_intersect = true;
+                    let mut next_point = c;
+                    loop {
+                        match ray_iter.next(){
+                            Some(p) if !pipe_cells.contains(p) => {
+                                break;
+                            },
+                            Some(_) => {
+                                // we hit a horizontal section of pipe, don't count as intersection
+                                is_real_intersect = false;
+                            },
+                            None => {break;}
+                        }
+                    }
+                    if is_real_intersect {
+                        intersections += 1;
+                    } else {
+                        println!("\tNot a real intersection, since intersecting a horizontal part of pipe");
+                    }
+                },
+                Some(_) => {},
+                None => {
+                    if intersections % 2 == 1 {
+                        count += 1;
+                    }
+                    break;
+                }
             }
-            None => {
-                if !pipe_cells.contains(&coordinate)  {
-                    enclosed_cells.insert(coordinate);
-                } 
-            }
         }
     }
-    // as a sanity check, filter out enclosed cells from things 
-    // found to be not fully enclosed 
-    let enclosed_cells:HashSet<&(usize,usize)> = enclosed_cells.iter().filter(|c| !not_enclosed_cells.contains(c)).collect();
-    println!("Enclosed cells: {:?}", enclosed_cells);
-    println!("Not enclosed cells: {:?}", not_enclosed_cells);
-    enclosed_cells.len() as u64
-}
-
-fn dfs_to_outside_maze(
-    m: &Maze,
-    path: MazePath,
-    blocked: &HashSet<(usize, usize)>,
-    validated: &HashSet<(usize, usize)>,
-    pipe: &HashSet<(usize, usize)>,
-) -> Option<MazePath> {
-    println!("dfs: path: {:?}", path);
-    println!("\tBlocked cells: {:?}", blocked);
-    println!("\tValidated cells: {:?}", validated);
-    println!("\tPipe cells: {:?}", pipe);
-    let current_cell = path
-        .cells
-        .last()
-        .expect("path should never be empty");
-    // end condition: we've reached a cell known to be blocked
-    if blocked.contains(current_cell) {
-        return None;
-    }
-    // end condition: we've reached a cell known to be escapable from the maze
-    if validated.contains(current_cell) {
-        return Some(path);
-    }
-    // end condition: we've hit a pipe and cannot proceed further
-    if pipe.contains(current_cell) {
-        println!("{:?} is part of the pipe", current_cell);
-        return None;
-    }
-    // end condition: we've reached a point outside of the map
-    match m.get(current_cell.0, current_cell.1) {
-        None => {
-            return Some(path);
-        }
-        _ => {}
-    }
-
-    let adjacent_coordinates = get_adj_coords(&current_cell);
-    for coordinate in adjacent_coordinates {
-        // end condition, an adjacent coordinate is outside of the maze
-        // if either coordinate is negative, we short circuit to avoid overflow
-        if coordinate.0 < 0 || coordinate.1 < 0 {
-            return Some(path);
-        }
-        let usized_coordinate = (coordinate.0 as usize, coordinate.1 as usize);
-        // skip any coordinate that's already in our path to avoid circular loops
-        if path.cells.contains(&usized_coordinate) {
-            continue;
-        }
-        let mut next_path = MazePath {
-            cells: path.cells.clone(),
-        };
-        next_path.cells.push(usized_coordinate);
-        match dfs_to_outside_maze(m, next_path, blocked, validated, pipe) {
-            Some(p) => {
-                // found a maze path, stop here
-                return Some(p);
-            }
-            None => continue,
-        }
-    }
-    println!("{:?} DFS'd to end of method without hitting a known terminal condition",current_cell);
-    None
+    count as u64
 }
 
 // DFS until we reach the starting point again and return the path
@@ -203,60 +143,22 @@ fn get_pipe_path(maze: &Maze, start: &(usize, usize)) -> MazePath {
         }
     }
     pipe_path
-}
+} 
 
-fn get_adj_coords(start: &(usize, usize)) -> Vec<(isize, isize)> {
-    let adj_deltas: Vec<(isize, isize)> = vec![
-        (1, 0),
-        (-1, 0),
-        (0, -1),
-        (0, 1),
-    ];
-    let adjacent_coords: Vec<(isize, isize)> = adj_deltas
-        .into_iter()
-        .map(|c| ((start.0 as isize + c.0), (start.1 as isize + c.1)))
-        .collect();
-    println!("\tAdj cells: {:?}", adjacent_coords);
-    adjacent_coords
-}
-
-/**
- * Need to check if something has no path outside of the maze 
- * but is also boxed outside of the maze pipe. this is a weird
- * edge case where a starting cell has no path to exit the maze,
- * but they're also not boxed in the pipe
- */
-fn is_boxed_out_of_maze(
-    maze: &Maze,
-    cell: &(usize, usize)) -> bool { 
-    // create two lookup tables where the i'th transform maps to the i'th list of blocker pipes
-    let transforms: Vec<(isize,isize)> = vec![(-1,0), (1,0), (0,-1), (0,1) ];
-    let blocker_pipes: Vec<Vec<char>> = vec![
-        vec!['-','L','J'],
-        vec!['-','F','7'],
-        vec!['|','J','7'],
-        vec!['|', 'F', 'L']
-    ];
-    for (i, transform) in transforms.iter().enumerate() { 
-        let adj_coord: (isize, isize) = (cell.0 as isize + transform.0, cell.1 as isize + transform.1);
-        // if an adjacent coordinate is out of the maze, 
-        // by definition it's not boxed in to anything since it can 
-        // reach the outside of the maze 
-        if adj_coord.0 < 0 || adj_coord.1 < 0 {
-            return false;
-        }
-        let valid_blockers = blocker_pipes.get(i).expect("should be evenly aligned with transforms");
-        let adj_coord_usize = (adj_coord.0 as usize, adj_coord.1 as usize);
-        match maze.get(adj_coord_usize.0, adj_coord_usize.1) { 
-            None => { // can reach the outside of the maze, not boxed in 
-                return false;
-            }, 
-            Some(c) => { 
-                if !valid_blockers.contains(c) { 
-                    return false; 
-                }
+fn get_ray(c: &(usize,usize), maze: &Maze) -> Vec<(usize,usize)> { 
+    let mut result: Vec<(usize,usize)> = Vec::new();
+    let mut dist = 0;
+    loop {
+        match maze.get(c.0, c.1+dist) {
+            Some(_) => {
+                result.push((c.0, c.1+dist));
+            },
+            None => {
+                break;
             }
         }
+        dist += 1;
+
     }
-    true
+    result
 }

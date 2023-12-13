@@ -30,7 +30,10 @@ impl Maze {
 
     // helper function to get value at a coordinate
     pub fn get(&self, row: usize, col: usize) -> Option<&char> {
-        let index = row * self.row_len + col;
+        if col >= self.row_len {
+            return None;
+        }
+        let index = row * self.row_len + col % self.row_len;
         self.cells.get(index)
     }
 
