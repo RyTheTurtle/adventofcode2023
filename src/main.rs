@@ -2,6 +2,7 @@ use std::time::Instant;
 
 mod day1;
 mod day10;
+mod day11;
 mod day2;
 mod day3;
 mod day4;
@@ -24,7 +25,7 @@ fn main() {
         .expect("Missing part argument")
         .parse()
         .expect("part should be a number");
-    print!("Day {:?} Part {:?} : ", day, part);
+    println!("Day {:?} Part {:?} : ", day, part);
 
     let input = util::read_lines(format!("./input/{}.txt", day));
     let start = Instant::now();
@@ -72,6 +73,11 @@ fn main() {
         10 => match part {
             1 => day10::part_1(&input),
             2 => day10::part_2(&input),
+            _ => panic!("Invalid part"),
+        },
+        11 => match part {
+            1 => day11::part_1(&input),
+            2 => day11::part_2(&input),
             _ => panic!("Invalid part"),
         },
         _ => 0,

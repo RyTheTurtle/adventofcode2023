@@ -5,3 +5,4 @@ pub mod grid;
 pub mod maze;
 pub mod oasis_report;
 pub mod scratchcard;
+pub mod cosmic_map;
