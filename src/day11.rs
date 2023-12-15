@@ -1,14 +1,14 @@
-use crate::structs::cosmic_map::{self, CosmicMap};
+use crate::structs::cosmic_map::CosmicMap;
 use itertools::Itertools;
 use std::collections::HashSet;
 
 pub fn part_1(input: &Vec<String>) -> u64 {
-    let mut cosmic_map = CosmicMap::from(input);
+    let cosmic_map = CosmicMap::from(input);
     compute_distances_between_galaxies(&cosmic_map, 2)
 }
 
 pub fn part_2(input: &Vec<String>) -> u64 {
-    let mut cosmic_map = CosmicMap::from(input);
+    let cosmic_map = CosmicMap::from(input);
     compute_distances_between_galaxies(&cosmic_map, 1000000)
 }
 
@@ -20,7 +20,7 @@ fn compute_distances_between_galaxies(cosmic_map: &CosmicMap, scale: isize) -> u
     let mut sum: u64 = 0;
     let empty_rows = cosmic_map.get_empty_rows();
     let empty_cols = cosmic_map.get_empty_cols();
-    for (i, p) in galaxy_pairs.iter().enumerate() {
+    for (_i, p) in galaxy_pairs.iter().enumerate() {
         let a = p[0];
         let b = p[1];
         let mut row_diff = (a.0 - b.0).abs();
@@ -29,12 +29,12 @@ fn compute_distances_between_galaxies(cosmic_map: &CosmicMap, scale: isize) -> u
         // subtracing 1 from the scale when adding
         for row in a.0.min(b.0)..b.0.max(a.0) {
             if empty_rows.contains(&row) {
-                row_diff += (scale - 1);
+                row_diff += scale - 1;
             }
         }
         for col in a.1.min(b.1)..b.1.max(a.1) {
             if empty_cols.contains(&col) {
-                col_diff += (scale - 1);
+                col_diff += scale - 1;
             }
         }
 
@@ -58,23 +58,22 @@ fn create_pairs(coordinates: &Vec<(isize, isize)>) -> Vec<Vec<&(isize, isize)>> 
     res
 }
 
-
 #[cfg(test)]
-mod tests { 
+mod tests {
     use crate::util;
 
-    use super::*; 
+    use super::*;
     // FIXME Move to integration tests
 
     #[test]
-    pub fn test_part1(){
-       let input =  util::read_lines("./input/11.txt");
-       assert_eq!(part_1(&input), 9536038);
+    pub fn test_part1() {
+        let input = util::read_lines("./input/11.txt");
+        assert_eq!(part_1(&input), 9536038);
     }
 
     #[test]
-    pub fn test_part2(){
-        let input =  util::read_lines("./input/11.txt");
+    pub fn test_part2() {
+        let input = util::read_lines("./input/11.txt");
         assert_eq!(part_2(&input), 447744640566);
-     }
+    }
 }

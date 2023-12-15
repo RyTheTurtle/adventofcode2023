@@ -75,23 +75,22 @@ fn next(m: &Mapping, n: u64) -> u64 {
     }
 }
 
-
 #[cfg(test)]
-mod tests { 
+mod tests {
     use crate::util;
 
-    use super::*; 
+    use super::*;
     // FIXME Move to integration tests
 
     #[test]
-    pub fn test_part1(){
-       let input =  util::read_lines("./input/5.txt");
-       assert_eq!(part_1(&input), 1181555926);
+    pub fn test_part1() {
+        let input = util::read_lines("./input/5.txt");
+        assert_eq!(part_1(&input), 1181555926);
     }
 
     #[test]
-    pub fn test_part2(){
-        let input =  util::read_lines("./input/5.txt");
+    pub fn test_part2() {
+        let input = util::read_lines("./input/5.txt");
         assert_eq!(part_2(&input), 37806486);
-     }
+    }
 }

@@ -104,23 +104,22 @@ fn get_power(g: GameCubeCount) -> u32 {
     g.0 * g.1 * g.2
 }
 
-
 #[cfg(test)]
-mod tests { 
+mod tests {
     use crate::util;
 
-    use super::*; 
+    use super::*;
     // FIXME Move to integration tests
 
     #[test]
-    pub fn test_part1(){
-       let input =  util::read_lines("./input/2.txt");
-       assert_eq!(part_1(&input), 2512);
+    pub fn test_part1() {
+        let input = util::read_lines("./input/2.txt");
+        assert_eq!(part_1(&input), 2512);
     }
 
     #[test]
-    pub fn test_part2(){
-        let input =  util::read_lines("./input/2.txt");
+    pub fn test_part2() {
+        let input = util::read_lines("./input/2.txt");
         assert_eq!(part_2(&input), 67335);
-     }
+    }
 }

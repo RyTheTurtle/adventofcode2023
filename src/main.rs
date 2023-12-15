@@ -1,4 +1,4 @@
-use std::{time::Instant, ops::ControlFlow};
+use std::time::Instant;
 
 mod day1;
 mod day10;
@@ -33,7 +33,7 @@ fn main() {
     solve_day(day, part);
 }
 
-fn solve_day(day: u8, part: u8)  {
+fn solve_day(day: u8, part: u8) {
     println!("Day {:?} Part {:?} : ", day, part);
     let input = util::read_lines(format!("./input/{}.txt", day));
     let start = Instant::now();
@@ -129,5 +129,4 @@ fn solve_day(day: u8, part: u8)  {
     }
     println!("{:?}", result);
     println!("Took {:?} ms", start.elapsed().as_millis());
-
 }

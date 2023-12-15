@@ -127,23 +127,22 @@ pub fn part_2(input: &Vec<String>) -> u64 {
     total_steps
 }
 
-
 #[cfg(test)]
-mod tests { 
+mod tests {
     use crate::util;
 
-    use super::*; 
+    use super::*;
     // FIXME Move to integration tests
 
     #[test]
-    pub fn test_part1(){
-       let input =  util::read_lines("./input/8.txt");
-       assert_eq!(part_1(&input), 20777);
+    pub fn test_part1() {
+        let input = util::read_lines("./input/8.txt");
+        assert_eq!(part_1(&input), 20777);
     }
 
     #[test]
-    pub fn test_part2(){
-        let input =  util::read_lines("./input/8.txt");
+    pub fn test_part2() {
+        let input = util::read_lines("./input/8.txt");
         assert_eq!(part_2(&input), 13289612809129);
-     }
+    }
 }

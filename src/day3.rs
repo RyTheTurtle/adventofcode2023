@@ -178,23 +178,22 @@ fn get<'a>(g: &'a Grid, c: &GridCoordinate) -> Option<&'a char> {
     };
 }
 
-
 #[cfg(test)]
-mod tests { 
+mod tests {
     use crate::util;
 
-    use super::*; 
+    use super::*;
     // FIXME Move to integration tests
 
     #[test]
-    pub fn test_part1(){
-       let input =  util::read_lines("./input/3.txt");
-       assert_eq!(part_1(&input), 521515);
+    pub fn test_part1() {
+        let input = util::read_lines("./input/3.txt");
+        assert_eq!(part_1(&input), 521515);
     }
 
     #[test]
-    pub fn test_part2(){
-        let input =  util::read_lines("./input/3.txt");
+    pub fn test_part2() {
+        let input = util::read_lines("./input/3.txt");
         assert_eq!(part_2(&input), 69527306);
-     }
+    }
 }

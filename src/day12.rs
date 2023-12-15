@@ -1,8 +1,5 @@
 use memoize::memoize;
 use regex::{self, Regex};
-use std::{collections::HashSet, fmt::Error};
-
-use crate::structs::camel_card::get;
 
 /**
  * we know backtracing brute force won't work for large scale.
@@ -25,7 +22,7 @@ pub fn part_1(input: &Vec<String>) -> u64 {
     return result;
 }
 
-pub fn part_2(input: &Vec<String>) -> u64 {
+pub fn part_2(_input: &Vec<String>) -> u64 {
     0
 }
 
@@ -80,7 +77,7 @@ fn validate_arrangements(input: String, num: usize) -> u64 {
                 }
             }
         }
-        Some(i) => {
+        Some(_i) => {
             return validate_arrangements(input.replacen("?", "#", 1), num)
                 + validate_arrangements(input.replacen("?", ".", 1), num);
         }

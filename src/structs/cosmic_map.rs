@@ -1,8 +1,5 @@
 use core::fmt;
-use std::{
-    collections::{HashMap, HashSet, VecDeque},
-    fmt::Write,
-};
+use std::fmt::Write;
 
 #[derive(Debug)]
 pub struct CosmicMap {
@@ -11,7 +8,7 @@ pub struct CosmicMap {
 
 impl From<&Vec<String>> for CosmicMap {
     fn from(value: &Vec<String>) -> Self {
-        let mut result = CosmicMap {
+        let result = CosmicMap {
             coordinates: value
                 .iter()
                 .map(|s| s.chars().collect())
