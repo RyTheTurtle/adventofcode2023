@@ -74,5 +74,4 @@ impl CosmicMap {
         }
         result
     }
-    
 }
