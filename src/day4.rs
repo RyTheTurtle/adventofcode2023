@@ -69,3 +69,24 @@ fn to_u8_vec(s: &str) -> Vec<u8> {
         .map(|a| a.parse().unwrap())
         .collect()
 }
+
+
+#[cfg(test)]
+mod tests { 
+    use crate::util;
+
+    use super::*; 
+    // FIXME Move to integration tests
+
+    #[test]
+    pub fn test_part1(){
+       let input =  util::read_lines("./input/4.txt");
+       assert_eq!(part_1(&input), 21485);
+    }
+
+    #[test]
+    pub fn test_part2(){
+        let input =  util::read_lines("./input/4.txt");
+        assert_eq!(part_2(&input), 11024379);
+     }
+}

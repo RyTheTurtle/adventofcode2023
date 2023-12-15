@@ -1,4 +1,4 @@
-use std::time::Instant;
+use std::{time::Instant, ops::ControlFlow};
 
 mod day1;
 mod day10;
@@ -30,8 +30,11 @@ fn main() {
         .expect("Missing part argument")
         .parse()
         .expect("part should be a number");
-    println!("Day {:?} Part {:?} : ", day, part);
+    solve_day(day, part);
+}
 
+fn solve_day(day: u8, part: u8)  {
+    println!("Day {:?} Part {:?} : ", day, part);
     let input = util::read_lines(format!("./input/{}.txt", day));
     let start = Instant::now();
     let result: u64 = match day {
@@ -112,7 +115,6 @@ fn main() {
         },
         _ => 0,
     };
-    // separate block for days requiring i64 output
     if result == 0 {
         let result = match day {
             9 => match part {
@@ -124,8 +126,8 @@ fn main() {
         };
         println!("{:?}", result);
         println!("Took {:?} ms", start.elapsed().as_millis());
-        return;
     }
     println!("{:?}", result);
     println!("Took {:?} ms", start.elapsed().as_millis());
+
 }

@@ -166,3 +166,24 @@ fn is_south(c: &char) -> bool {
         _ => false,
     }
 }
+
+
+#[cfg(test)]
+mod tests { 
+    use crate::util;
+
+    use super::*; 
+    // FIXME Move to integration tests
+
+    #[test]
+    pub fn test_part1(){
+       let input =  util::read_lines("./input/10.txt");
+       assert_eq!(part_1(&input), 6931);
+    }
+
+    #[test]
+    pub fn test_part2(){
+        let input =  util::read_lines("./input/10.txt");
+        assert_eq!(part_2(&input), 357);
+     }
+}

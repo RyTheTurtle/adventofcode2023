@@ -88,3 +88,23 @@ fn get_first_digit_from_text(s: &[u8]) -> Option<char> {
     }
     return None;
 }
+
+#[cfg(test)]
+mod tests { 
+    use crate::util;
+
+    use super::*; 
+    // FIXME Move to integration tests
+
+    #[test]
+    pub fn test_part1(){
+       let input =  util::read_lines("./input/1.txt");
+       assert_eq!(part_1(&input), 54630);
+    }
+
+    #[test]
+    pub fn test_part2(){
+        let input =  util::read_lines("./input/1.txt");
+        assert_eq!(part_2(&input), 54770);
+     }
+}

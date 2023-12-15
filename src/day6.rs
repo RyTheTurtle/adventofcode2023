@@ -37,3 +37,24 @@ pub fn part_2(input: &Vec<String>) -> u64 {
     }
     return *ways_to_beat_record.get(0).unwrap();
 }
+
+
+#[cfg(test)]
+mod tests { 
+    use crate::util;
+
+    use super::*; 
+    // FIXME Move to integration tests
+
+    #[test]
+    pub fn test_part1(){
+       let input =  util::read_lines("./input/6.txt");
+       assert_eq!(part_1(&input), 1624896);
+    }
+
+    #[test]
+    pub fn test_part2(){
+        let input =  util::read_lines("./input/6.txt");
+        assert_eq!(part_2(&input), 32583852);
+     }
+}
