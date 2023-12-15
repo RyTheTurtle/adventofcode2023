@@ -1,3 +1,7 @@
+use std::error::Error;
+
+use regex::Regex;
+
 pub fn part_1(v: &Vec<String>) -> u32 {
     v.iter().map(get_calibration_value).sum()
 }
@@ -7,18 +11,13 @@ pub fn part_2(v: &Vec<String>) -> u32 {
 }
 
 fn get_calibration_value(s: &String) -> u32 {
-    const BLANK: char = '-';
-    let mut digits: (char, char) = (BLANK, BLANK);
-    for c in s.chars() {
-        if c.is_digit(10) {
-            if digits.0 == BLANK {
-                digits.0 = c;
-            }
-            digits.1 = c;
-        }
-    }
-    let res = combine_digits(&digits);
-    res
+    let re = Regex::new("([0-9]{1})").unwrap();
+    let d1 = re.find_iter(s).nth(0).unwrap();
+    let d2 = re.find_iter(s).last().unwrap();
+    // extract single char from each match
+    let d1 = d1.as_str().chars().nth(0).unwrap();
+    let d2 = d2.as_str().chars().nth(0).unwrap();
+    combine_digits(&(d1,d2))
 }
 
 fn combine_digits(digits: &(char, char)) -> u32 {
