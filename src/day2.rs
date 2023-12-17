@@ -20,11 +20,7 @@ pub fn part_2(input: &Vec<String>) -> u32 {
 
 fn build_game(input: &String) -> Game {
     let input_parts: Vec<&str> = input.split(":").collect();
-    let game_id_parts: Vec<&str> = input_parts
-        .get(0)
-        .unwrap()
-        .split_ascii_whitespace()
-        .collect();
+    let game_id_parts: Vec<&str> = input_parts.get(0).unwrap().split_ascii_whitespace().collect();
     let game_id: u32 = game_id_parts.get(1).unwrap().parse().unwrap();
     let raw_rounds: Vec<&str> = input_parts.get(1).unwrap().split(";").collect();
     let rounds: Vec<Round> = raw_rounds.iter().map(build_round).collect();
@@ -45,12 +41,7 @@ fn build_round(input: &&str) -> Round {
     let round_parts = input.split(",");
     for part in round_parts {
         let dice_and_count: Vec<&str> = part.split_ascii_whitespace().collect();
-        match dice_and_count
-            .get(1)
-            .unwrap()
-            .to_string()
-            .as_str()
-        {
+        match dice_and_count.get(1).unwrap().to_string().as_str() {
             "blue" => {
                 result.blue_count = dice_and_count.get(0).unwrap().parse().unwrap();
             }

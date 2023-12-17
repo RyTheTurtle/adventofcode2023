@@ -9,10 +9,7 @@ pub struct CosmicMap {
 impl From<&Vec<String>> for CosmicMap {
     fn from(value: &Vec<String>) -> Self {
         let result = CosmicMap {
-            coordinates: value
-                .iter()
-                .map(|s| s.chars().collect())
-                .collect(),
+            coordinates: value.iter().map(|s| s.chars().collect()).collect(),
         };
         result
     }
@@ -43,17 +40,9 @@ impl CosmicMap {
 
     pub fn get_empty_cols(&self) -> Vec<isize> {
         let mut result: Vec<isize> = Vec::new();
-        let column_range = self
-            .coordinates
-            .get(0)
-            .expect("map should not be empty")
-            .len();
+        let column_range = self.coordinates.get(0).expect("map should not be empty").len();
         for column in 0..column_range {
-            if self
-                .coordinates
-                .iter()
-                .all(|r| r.get(column).unwrap() == &'.')
-            {
+            if self.coordinates.iter().all(|r| r.get(column).unwrap() == &'.') {
                 result.push(column as isize);
             }
         }

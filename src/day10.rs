@@ -6,9 +6,7 @@ use std::{
 
 pub fn part_1(input: &Vec<String>) -> u64 {
     let maze = Maze::from(input);
-    let start = maze
-        .find(&'S')
-        .expect("Should always have a starting point");
+    let start = maze.find(&'S').expect("Should always have a starting point");
     // BFS searching tracking the distance of cells at each point
     let mut paths: VecDeque<MazePath> = VecDeque::new();
     paths.push_back(MazePath { cells: vec![start] });
@@ -50,9 +48,7 @@ pub fn part_1(input: &Vec<String>) -> u64 {
 
 pub fn part_2(input: &Vec<String>) -> u64 {
     let maze = Maze::from(input);
-    let start = maze
-        .find(&'S')
-        .expect("Should always have a starting point");
+    let start = maze.find(&'S').expect("Should always have a starting point");
     // DFS through the whole maze as a single path
     let pipe_path: MazePath = get_pipe_path(&maze, &start);
 
@@ -88,12 +84,7 @@ pub fn part_2(input: &Vec<String>) -> u64 {
             println!("Ray: {:?}", ray);
             println!("North/South intersections: {:?}", north_south_intersections);
         }
-        if north_south_intersections
-            .0
-            .min(north_south_intersections.1)
-            % 2
-            == 1
-        {
+        if north_south_intersections.0.min(north_south_intersections.1) % 2 == 1 {
             count += 1;
         }
     }
@@ -110,10 +101,7 @@ fn get_pipe_path(maze: &Maze, start: &(usize, usize)) -> MazePath {
     };
     pipe_path.cells.reserve(15000);
     loop {
-        let current: &(usize, usize) = pipe_path
-            .cells
-            .last()
-            .expect("path cannot be empty");
+        let current: &(usize, usize) = pipe_path.cells.last().expect("path cannot be empty");
         // update distance of current to longest path we've found so far
         match distances.get(current) {
             Some(_) => break,

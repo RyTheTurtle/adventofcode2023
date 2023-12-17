@@ -2,19 +2,12 @@ use crate::structs::scratchcard::ScratchCard;
 use std::collections::HashSet;
 
 pub fn part_1(input: &Vec<String>) -> u64 {
-    input
-        .into_iter()
-        .map(to_card)
-        .map(get_score)
-        .sum()
+    input.into_iter().map(to_card).map(get_score).sum()
 }
 
 pub fn part_2(input: &Vec<String>) -> u64 {
-    let winning_number_counts: Vec<u8> = input
-        .into_iter()
-        .map(to_card)
-        .map(count_winning_numbers)
-        .collect();
+    let winning_number_counts: Vec<u8> =
+        input.into_iter().map(to_card).map(count_winning_numbers).collect();
 
     let mut card_counts: Vec<u64> = Vec::with_capacity(winning_number_counts.len());
     for _ in 0..winning_number_counts.len() {
@@ -48,14 +41,8 @@ fn get_score(c: ScratchCard) -> u64 {
 }
 
 fn to_card(s: &String) -> ScratchCard {
-    let parts: Vec<Vec<u8>> = s
-        .split(":")
-        .into_iter()
-        .nth(1)
-        .unwrap()
-        .split("|")
-        .map(to_u8_vec)
-        .collect();
+    let parts: Vec<Vec<u8>> =
+        s.split(":").into_iter().nth(1).unwrap().split("|").map(to_u8_vec).collect();
 
     ScratchCard {
         numbers_you_have: parts.get(0).unwrap().to_vec(),
@@ -64,10 +51,7 @@ fn to_card(s: &String) -> ScratchCard {
 }
 
 fn to_u8_vec(s: &str) -> Vec<u8> {
-    s.trim()
-        .split_ascii_whitespace()
-        .map(|a| a.parse().unwrap())
-        .collect()
+    s.trim().split_ascii_whitespace().map(|a| a.parse().unwrap()).collect()
 }
 
 #[cfg(test)]

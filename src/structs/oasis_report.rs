@@ -19,10 +19,7 @@ pub struct PointHistory {
 impl PointHistory {
     pub fn from(input: &String) -> PointHistory {
         PointHistory {
-            values: input
-                .split_ascii_whitespace()
-                .map(|c| c.parse::<i64>().unwrap())
-                .collect(),
+            values: input.split_ascii_whitespace().map(|c| c.parse::<i64>().unwrap()).collect(),
         }
     }
 

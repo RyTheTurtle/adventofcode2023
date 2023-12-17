@@ -64,11 +64,7 @@ fn get_dest(r: &MapRange, n: u64) -> u64 {
 }
 
 fn next(m: &Mapping, n: u64) -> u64 {
-    let range: Vec<&MapRange> = m
-        .ranges
-        .iter()
-        .filter(|r| is_in_range(r, n))
-        .collect();
+    let range: Vec<&MapRange> = m.ranges.iter().filter(|r| is_in_range(r, n)).collect();
     match range.get(0) {
         Some(r) => get_dest(r, n),
         None => n,

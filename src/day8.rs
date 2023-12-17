@@ -72,10 +72,7 @@ pub fn part_1(input: &Vec<String>) -> u64 {
 
 fn get_factors(n: u64) -> Vec<u64> {
     // iterates over numbers 1-n, filters by n being divisible by x
-    (1..n / 2 + 1)
-        .into_iter()
-        .filter(|&x| n % x == 0)
-        .collect::<Vec<u64>>()
+    (1..n / 2 + 1).into_iter().filter(|&x| n % x == 0).collect::<Vec<u64>>()
 }
 
 /**the LCM of two numbers 'a' and 'b' is equal to the product of the 2 numbers divided by the highest common factor (HCF) of the 2 numbers. */
@@ -86,11 +83,7 @@ fn get_lcm(a: u64, b: u64) -> u64 {
         return a.min(b);
     }
     let smaller_factors = get_factors(smaller);
-    let hcf = smaller_factors
-        .iter()
-        .filter(|a| b % *a == 0)
-        .max()
-        .unwrap();
+    let hcf = smaller_factors.iter().filter(|a| b % *a == 0).max().unwrap();
     (a * b) / hcf
 }
 

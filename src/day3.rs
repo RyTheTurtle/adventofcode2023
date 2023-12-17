@@ -46,11 +46,7 @@ pub fn part_1(input: &Vec<String>) -> u32 {
                 break;
             } else {
                 seen.insert(coordinate);
-                value = value * 10
-                    + get(&grid, &coordinate)
-                        .unwrap()
-                        .to_digit(10)
-                        .unwrap();
+                value = value * 10 + get(&grid, &coordinate).unwrap().to_digit(10).unwrap();
             }
         }
         if is_new_number {

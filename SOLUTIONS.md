@@ -184,3 +184,31 @@ This mostly worked except for edge cases where some points were prevented from h
 After researching and consulting peers working on this, I learned about the approach of ray casting. Basically, this means you iterate over every point, "cast a ray" infinitely right to the end of the maze, and count the number of intersections of this ray with the pipe path. Then take the minimum value of the intersection of north or south bound intersections and if the number is odd, that means the point is enclosed in the loop. 
 
 "casting a ray" basically means build a list of points extending in a direction (here, it's horizontally right) from the starting point to the end of the grid boundary. So in a 5x5 grid, the ray from piont `(1,1)`  to the end of the grid is `[(1,1), (1,2), (1,3),(1,4)]`. This approach properly accounts for weird pipe shapes and lets us get the answer. 
+
+## Day 11 
+### Part 1 
+Simple approach is to 
+1. iterate over the entire input to collect coordinates of galaxies 
+2. generate a list of unique combinations of galaxies to measure distance between. This is easily done with iteration, storing each galaxy pair as a sorted tuple of `(src, dest)` and saving them in a HashSet to dedup. 
+3. for each coordinate pair, since we cannot move diagonally, the distance between two galaxies is just `abs(distance between rows) + abs(distance between columns)`. Add these up for all the galaxy pairs to get the answer. 
+
+### Part 2
+The methodology is the same as part 1, except to avoid running out of memory trying to generate a huge map, we just do a little extra math. First scan the input and identify all rows or columns that need to be expanded by a factor of `scale`. Then, when performing the steps above, for any row or column between the two galaxies being measured, add an additional `scale` to the sum of the distances. So part 1 this scale factor is 0, and for part 2 the logic is exactly the same except it's `1000000`. 
+
+## Day 12
+### Part 1
+I originally solved this in python doing a recursive backtracking algorithm to generate all possible valid combinations of strings and then analyzing each one to see if it viable. Brute force but worked well enough for part 1. 
+
+### Part 2 
+The scaling issue is magnified here by dramatically increasing the length of the inputs. The right approach to this is to break the strings up in to "sub problems" by analyzing each substring each input line to see how many possible ways it can be solved. For example, the string `???.### 1,1,3`, you'd first look at the contiguous block `???`, recognize that there are 3 unknown blocks for a total maximum possible broken springs of 3, then collect all of the spring configurations that are able to be solved in this block and do the normal DFS brute force approach. So in this case, with `???`, the maximum springs we could possibly have is 3. But in our lineup, we actually have `1,1,3` so we can only possibly satisfy `1,1` in this block. So we'd solve `variations('???', [1,1])`, then our remaining problem is `.### 3`. there's only one configuration valid for this remaining problem since it has no `?` spots, so the result is `1 * 1 = 1`. 
+
+This not only significantly reduces the overall iterations that need to be done to solve any one string, but it also makes it possible to cache the smaller sub problems in memory to further speed up the code. 
+
+## Day 13
+### Part 1
+Part 1 is a straightforward algorithm to check symmetry across lines on a grid. We just iterate over each grid and check each possible symmetry line for a valid crossing, adding up the totals. 
+
+### Part 2 
+Part 2 is the same approach but we 
+1. expand the input set to contain all the possible combinations of non-smudged mirrors
+2. verify we found a different symmetry line than the original symmetry line. This part was particularly troublesome to accurately detect when we found a different symmetry line since the logic involves tracking whether the original symmetry line was horizontal and vertical. 

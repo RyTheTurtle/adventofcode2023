@@ -75,10 +75,7 @@ fn rank_jokers(h: &Vec<CamelCard>) -> HandType {
 }
 
 pub fn part_1(input: &Vec<String>) -> u64 {
-    let mut bids: Vec<Bid> = input
-        .iter()
-        .map(|s| parse_bid(s, parse_hand, rank))
-        .collect();
+    let mut bids: Vec<Bid> = input.iter().map(|s| parse_bid(s, parse_hand, rank)).collect();
     bids.sort_by(compare_bid);
     let mut result: u64 = 0;
     for (i, bid) in bids.into_iter().enumerate() {
@@ -88,10 +85,7 @@ pub fn part_1(input: &Vec<String>) -> u64 {
 }
 
 pub fn part_2(input: &Vec<String>) -> u64 {
-    let mut bids: Vec<Bid> = input
-        .iter()
-        .map(|s| parse_bid(s, parse_hand, rank_jokers))
-        .collect();
+    let mut bids: Vec<Bid> = input.iter().map(|s| parse_bid(s, parse_hand, rank_jokers)).collect();
     bids.sort_by(compare_bid);
     let mut result: u64 = 0;
     for (i, bid) in bids.into_iter().enumerate() {

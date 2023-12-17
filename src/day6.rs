@@ -15,9 +15,7 @@ pub fn part_1(input: &Vec<String>) -> u64 {
         }
         ways_to_beat_record.push(winning_options);
     }
-    return ways_to_beat_record
-        .iter()
-        .fold(1, |acc, &e| acc * e);
+    return ways_to_beat_record.iter().fold(1, |acc, &e| acc * e);
 }
 
 pub fn part_2(input: &Vec<String>) -> u64 {
