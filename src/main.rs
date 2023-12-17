@@ -126,7 +126,8 @@ fn solve_day(day: u8, part: u8) {
         };
         println!("{:?}", result);
         println!("Took {:?} us", start.elapsed().as_micros());
+    } else {
+        println!("{:?}", result);
+        println!("Took {:?} us", start.elapsed().as_micros());
     }
-    println!("{:?}", result);
-    println!("Took {:?} us", start.elapsed().as_micros());
 }

@@ -212,3 +212,32 @@ Part 1 is a straightforward algorithm to check symmetry across lines on a grid. 
 Part 2 is the same approach but we 
 1. expand the input set to contain all the possible combinations of non-smudged mirrors
 2. verify we found a different symmetry line than the original symmetry line. This part was particularly troublesome to accurately detect when we found a different symmetry line since the logic involves tracking whether the original symmetry line was horizontal and vertical. 
+
+## Day 14
+### Part 1
+This part of the problem involves performing a transformation on the input grid and then a simple iterative calculation. I found that at this point, I've been struggling with the borrow checker in Rust to manipulate and swap specific characters in specific indices of strings especially when I have a container of strings like a `Vec<String`. So the easier approach to maintain memory safety while not having absurd amounts of code and match blocks was to convert the 2D input in to a 1D `Vec<u8>`. Rust's `Vec` has an efficient built in method to swap items at two given indices that doesn't involve tricky borrowing with the borrow checker, so doing row and column math to determine the right offsets to check and swap was a simpler and more memory and CPU efficient approach. 
+
+The algorithm for shifting round rocks north to simulate tipping the platform north is (using math to compute the offset for row and column where a cell `(row,col)` is located at index `(row * row_width)+col` in the 1D representation of the 2D grid)
+1. start at the first cell on the second row of the grid 
+2. iterate through the grid left to right, row by row, until we find a round rock 
+3. examine the coordinate directly north of the round rock. 
+   1. if it's an empty cell, swap the empty cell and the round rock and repeat the process starting from step 1
+   2. otherwise it's not valid so skip it and move on
+4. when we get to an iteration where we can no longer find any round rocks with valid moves, we're done shifting rocks so just calculate the load using the simple formula from the problem description. 
+
+This didn't need too much optimization, since the transformations were relatively fast 
+
+### Part 2
+Part two is the same concept except for two important differences
+1. instead of shifting north, we now have a cycle to shift north, west, south, and east 
+2. we have to do this cycle 1 billion times
+
+To implement the cycling logic, we take a similar approach by iterating and testing cells on the 1D representation of the 2D input grid. This is, however, very very slow for doing it 1B times, so there are three options we have 
+1. brute force it and keep the laptop plugged in, hoping we finish before christmas.
+2. do some refactoring to enable the cycling method to be memoized. If there's repetiion in the grid configurations 
+after some `N` cycles, the memoization will dramatically reduce repetitive computations and probably give us a chance to brute force an answer 
+3. do some fancier coding to detect the length of a cycle and figure out at what point in the cycle we'll be when we reach the 1 billion'th iteration. This is the most efficient approach since we can skip the 1B iterations of checking the memoization cache. 
+
+I started with option 2 since we have a useful `memoize` library at our disposal. This approach on my M2 macbook pro took 848 seconds to finish (~14.5 minutes). Since it didn't take days to finish, that tells me we likely found a cycle in the input. Inspecting further, the cycle seems to happen every 7 "cyclings" of the dish, starting with the 9th iteration (basically meaning we don't have a cycle that contains the first 2 rounds of the 1B rounds). So the math works out to `iterations % 7 + 2` should be the same state as the ending `iterations`. 
+
+Approach 3 took the processing time for the sample input from 14.5 minutes -> 2 milliseconds, so that is clearly the approach to take. 
