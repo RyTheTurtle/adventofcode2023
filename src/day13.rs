@@ -7,16 +7,18 @@ pub fn part_1(input: &Vec<String>) -> u64 {
     let mut no_reflection_cnt = 0;
     let patches = partiiton_on_empty(input);
     for patch in patches { 
-        match get_horizontal_reflection(&patch) {
+        match get_vertical_line_reflection(&patch, 0, 1) {
             Some(p) => {
                 result += p as u64;
-            }
-            None => match get_vertical_reflection(&patch) {
+            },
+            None => match get_horizontal_line_reflection(&patch, 0, 1) {
                 Some(p) => {
                     result += (100 * p) as u64;
                 }
                 None => {
                     // println!("No reflection found for {:?}",patch);
+                    println!("No reflection found for ");
+                    print_block(&patch);
                     no_reflection_cnt += 1; 
                 }
             },
@@ -30,77 +32,60 @@ pub fn part_2(_input: &Vec<String>) -> u64 {
     0
 }
 
-
-fn get_vertical_reflection(input: &Vec<String>) -> Option<usize> {
-    let mut pivot = 1;
-    // split input in half on a horizontal line and
-    // check to see if both sides are equal. Progressively
-    // shorten the pivot line until we run out of possible reflections
-    while pivot < input.len() {
-        // we need to do this check to make sure we do the proper 
-        // math for finding partial reflections either above or below 
-        // the halfway point
-        if pivot > input.len() / 2 {
-            let mut bottom = input[pivot..].iter();
-            let mut top = input[pivot - bottom.len()..pivot].iter().rev();
-            if top.all(|t| t == bottom.next().unwrap()) {
-                return Some(pivot);
-            }
-        } else {
-            let mut top = input[..pivot].iter().rev();
-            let mut bottom = input[pivot..pivot+top.len()].iter();
-            
-            if top.all(|t| t == bottom.next().unwrap()) {
-                return Some(pivot);
-            }
-        }
-        
-        pivot+= 1;
-    }
-
-    None
-}
-
-fn get_horizontal_reflection(input: &Vec<String>) -> Option<u64> {
-    let pivot =  1;
-
-    return match get_horizontal_pivot(input.get(0).expect("input should not be empty"), pivot) {
-        Some(p) => {
-            if input
-                .iter()
-                .all(|i| get_horizontal_pivot(i, pivot) == Some(p))
-            {
-                Some(p as u64)
-            } else {
-                None
-            }
-        }
-        None => None,
-    };
-}
-
-fn get_horizontal_pivot(input: &String, pivot: usize) -> Option<usize> {
-    if pivot >= input.len() {
+fn get_vertical_line_reflection(patch: &Vec<String>, left_straddle: usize, right_straddle: usize) -> Option<usize> { 
+    let patch_width = patch[0].len();
+    if right_straddle >= patch_width {
         return None;
     }
-    let right: &str;
-    let left: &str; 
-    if pivot > input.len() / 2 {
-        right = &input[pivot..];
-        left = &input[pivot - right.len()..pivot];
-    } else {
-        left = &input[..pivot];
-        right = &input[pivot..pivot+left.len()+1];
-        
+    let mut is_reflection = true; 
+    'dist: for distance in 0..patch_width { 
+        // bounds check
+        if left_straddle < distance || right_straddle + distance >= patch_width {
+            break;
+        }
+        for line in patch { 
+            let c1 = line.chars().nth(left_straddle-distance).unwrap();
+            let c2 = line.chars().nth(right_straddle+distance).unwrap();
+            if c1 != c2 { 
+                is_reflection = false;
+                continue 'dist;
+            }
+        }
     }
-    
-    return match String::from(right)
-        == String::from(left)
-            .chars()
-            .rev()
-            .collect::<String>()
-    {
-        true => Some(pivot),
-        false => get_horizontal_pivot(input, pivot + 1),
+    if is_reflection { 
+        return Some(right_straddle);
     }
+    return get_vertical_line_reflection(patch, left_straddle+1, right_straddle+1);
+}
+
+fn get_horizontal_line_reflection(patch: &Vec<String>, top_straddle: usize, bottomn_straddle: usize) -> Option<usize> {
+    let patch_len = patch.len();
+    if bottomn_straddle >= patch_len {
+        return None; 
+    }
+    let mut is_reflection = true; 
+    for distance in 0..patch_len {
+        // bounds check 
+        if top_straddle < distance || distance + bottomn_straddle >= patch_len {
+            break;
+        }
+        let top = patch.get(top_straddle - distance).unwrap();
+        let bottom = patch.get(bottomn_straddle+distance).unwrap();
+        if top != bottom { 
+            is_reflection = false;
+            break;
+        } 
+    }
+    if is_reflection{ 
+        return Some(bottomn_straddle);
+    }
+    return get_horizontal_line_reflection(patch, top_straddle+1, bottomn_straddle+1);
+}
+
+fn print_block(s: &Vec<String>){
+    println!("Block:::");
+    for line in s { 
+        println!("{}",line);
+    }
+    println!(":::")
 }
