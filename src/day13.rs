@@ -1,4 +1,4 @@
-use crate::util::partiiton_on_empty;
+use crate::util::{partiiton_on_empty, print_block};
 
 pub fn part_1(input: &Vec<String>) -> u64 {
     let mut result = 0;
@@ -174,10 +174,22 @@ fn get_all_vertical_reflection(patch: &Vec<String>) -> Vec<usize> {
     return result;
 }
 
-fn print_block(s: &Vec<String>) {
-    println!("Block:::");
-    for line in s {
-        println!("{}", line);
+#[cfg(test)]
+mod tests {
+    use crate::util;
+
+    use super::*;
+    // FIXME Move to integration tests
+
+    #[test]
+    pub fn test_part1() {
+        let input = util::read_lines("./input/13.txt");
+        assert_eq!(part_1(&input), 35691);
     }
-    println!(":::")
+
+    #[test]
+    pub fn test_part2() {
+        let input = util::read_lines("./input/13.txt");
+        assert_eq!(part_2(&input), 39037);
+    }
 }

@@ -42,3 +42,10 @@ pub fn parse_number_vec_following_colon(s: &String) -> Vec<u64> {
         .map(|n| n.parse::<u64>().unwrap())
         .collect()
 }
+
+pub fn print_block(s: &Vec<String>) {
+    for line in s {
+        println!("{}", line);
+    }
+    println!("")
+}
