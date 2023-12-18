@@ -1,4 +1,4 @@
-use std::{collections::HashSet, fmt::Debug, time::Instant};
+use std::{fmt::Debug, collections::HashSet, time::Instant, ops::Index};
 
 use itertools::Itertools;
 use memoize::memoize;
@@ -57,23 +57,31 @@ impl Dish {
 
 pub fn part_2(input: &Vec<String>) -> u64 {
     let mut dish: Dish = Dish::from(input.clone());
+    let mut cache: HashSet<Dish> = HashSet::new();
     let total_iterations = 1_000_000_000;
+    let mut cycle_size = 0;
+    let mut numerator = 0;
     let start = Instant::now();
     // worst case, if we never had a cycle...
-    // brute forced with memoization
-    for i in 0..total_iterations {
-        if i % 1_000_000 == 0 {
-            println!(
-                "Processed {}, elapsed: {}ms",
-                i,
-                start.elapsed().as_millis()
-            );
-        }
-
+    let mut hist: Vec<Dish> = Vec::new();
+    let mut last_idx = 0;
+    let mut finished_loops = 0;
+    for i in 0..total_iterations{ 
+        println!("Processed {}, elapsed: {}ms", i, start.elapsed().as_millis()); 
+        finished_loops = i;
         dish = cycle(dish);
+        let cloned = dish.clone();
+        if !cache.contains(&cloned){
+            cache.insert(cloned);
+            hist.push(dish.clone());
+        } else {
+            println!("Found a cycle at {}, cycle size {}", i, cache.len());
+            last_idx = hist.iter().find_position(|d| **d == dish).unwrap().0;
+            break;
+        }
     }
-
-    dish.get_load() as u64
+    let result_idx = (last_idx) + (total_iterations-1-finished_loops) % (finished_loops - last_idx);
+    hist.get(result_idx).unwrap().get_load() as u64
 }
 
 #[memoize]
@@ -104,7 +112,7 @@ fn tilt_north(dish: Dish) -> Dish {
             }
         }
     }
-    if swapped {
+    if swapped { 
         return tilt_north(dish);
     }
     dish
@@ -133,7 +141,7 @@ fn tilt_south(dish: Dish) -> Dish {
             }
         }
     }
-    if swapped {
+    if swapped { 
         return tilt_south(dish);
     }
     dish
